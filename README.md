@@ -6,7 +6,7 @@
 
 ![Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white)
-![Min SDK](https://img.shields.io/badge/Min%20SDK-26-blue)
+![Min SDK](https://img.shields.io/badge/Min%20SDK-31-blue)
 ![Architecture](https://img.shields.io/badge/Architecture-MVVM-orange)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
