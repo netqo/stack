@@ -1,0 +1,8 @@
+# Build artifacts
+build/
+
+# Editor / tooling caches
+.cache/
+
+# Generated compilation database
+compile_commands.json
