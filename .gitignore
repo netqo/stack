@@ -1,0 +1,29 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Firebase / Google Services
+app/google-services.json
+
+# Secrets file pattern
+secrets.properties
+
+# Signing keystore
+*.jks
+*.keystore
+
+# Kotlin compiler cache
+.kotlin/
+google-services.json
