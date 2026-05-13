@@ -87,7 +87,7 @@ extern "C"
 
   /** @brief JNI bridge for ProvablyFairCore::calculateCoinflip. */
   JNIEXPORT jstring JNICALL
-  Java_com_casino_tpo_engine_NativeGameEngine_evaluateCoinflip(
+  Java_com_plainstudio_stackcasino_engine_NativeGameEngine_evaluateCoinflip(
       JNIEnv *env, jobject /* this */, jstring serverSeed, jstring clientSeed,
       jlong nonce)
   {
@@ -98,7 +98,7 @@ extern "C"
 
   /** @brief JNI bridge for ProvablyFairCore::calculateRoulette. */
   JNIEXPORT jstring JNICALL
-  Java_com_casino_tpo_engine_NativeGameEngine_evaluateRoulette(
+  Java_com_plainstudio_stackcasino_engine_NativeGameEngine_evaluateRoulette(
       JNIEnv *env, jobject /* this */, jstring serverSeed, jstring clientSeed,
       jlong nonce)
   {
@@ -109,7 +109,7 @@ extern "C"
 
   /** @brief JNI bridge for ProvablyFairCore::calculateCrashPoint. */
   JNIEXPORT jstring JNICALL
-  Java_com_casino_tpo_engine_NativeGameEngine_evaluateCrashPoint(
+  Java_com_plainstudio_stackcasino_engine_NativeGameEngine_evaluateCrashPoint(
       JNIEnv *env, jobject /* this */, jstring serverSeed, jstring clientSeed,
       jlong nonce)
   {
@@ -120,7 +120,7 @@ extern "C"
 
   /** @brief JNI bridge for ProvablyFairCore::calculateMines. */
   JNIEXPORT jstring JNICALL
-  Java_com_casino_tpo_engine_NativeGameEngine_evaluateMines(
+  Java_com_plainstudio_stackcasino_engine_NativeGameEngine_evaluateMines(
       JNIEnv *env, jobject /* this */, jstring serverSeed, jstring clientSeed,
       jlong nonce, jint numMines)
   {
@@ -132,7 +132,7 @@ extern "C"
 
   /** @brief JNI bridge for ProvablyFairCore::calculateBlackjackDeck. */
   JNIEXPORT jstring JNICALL
-  Java_com_casino_tpo_engine_NativeGameEngine_evaluateBlackjackDeck(
+  Java_com_plainstudio_stackcasino_engine_NativeGameEngine_evaluateBlackjackDeck(
       JNIEnv *env, jobject /* this */, jstring serverSeed, jstring clientSeed,
       jlong nonce)
   {
