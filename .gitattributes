@@ -1,0 +1,63 @@
+# Auto-detect text files and normalize line endings to LF in the repo.
+* text=auto eol=lf
+
+# Source code: force LF regardless of platform.
+*.kt        text eol=lf
+*.kts       text eol=lf
+*.java      text eol=lf
+*.c         text eol=lf
+*.cc        text eol=lf
+*.cpp       text eol=lf
+*.cxx       text eol=lf
+*.h         text eol=lf
+*.hh        text eol=lf
+*.hpp       text eol=lf
+*.hxx       text eol=lf
+
+# Configuration and docs: force LF.
+*.md        text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.json      text eol=lf
+*.toml      text eol=lf
+*.xml       text eol=lf
+*.properties text eol=lf
+*.gradle    text eol=lf
+*.cmake     text eol=lf
+CMakeLists.txt text eol=lf
+
+# Windows-only scripts: force CRLF.
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+
+# Unix shell wrappers: force LF.
+gradlew     text eol=lf
+
+# Treat as binary (no diff, no line-ending conversion).
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.webp      binary
+*.ico       binary
+*.svg       text eol=lf
+*.pdf       binary
+*.jar       binary
+*.war       binary
+*.aar       binary
+*.apk       binary
+*.aab       binary
+*.so        binary
+*.dll       binary
+*.dylib     binary
+*.keystore  binary
+*.jks       binary
+*.ttf       binary
+*.otf       binary
+*.woff      binary
+*.woff2     binary
+
+# GitHub linguist: keep generated/vendored code out of language statistics.
+gradle/wrapper/* linguist-vendored
+gradlew          linguist-vendored
+gradlew.bat      linguist-vendored

@@ -1,0 +1,43 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 120
+
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+[*.{yml,yaml,json,toml}]
+indent_size = 2
+
+[*.{kt,kts}]
+indent_size = 4
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+
+[*.{c,cc,cpp,cxx,h,hh,hpp,hxx}]
+indent_size = 2
+
+[*.{gradle,gradle.kts}]
+indent_size = 4
+
+[*.xml]
+indent_size = 4
+
+[Makefile]
+indent_style = tab
+
+[*.{bat,cmd}]
+end_of_line = crlf
+
+[gradlew]
+end_of_line = lf
+
+[gradlew.bat]
+end_of_line = crlf
