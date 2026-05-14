@@ -1,0 +1,25 @@
+# Code ownership for the Stack Casino monorepo.
+#
+# This file is consulted by GitHub when a pull request modifies a path that
+# matches a rule below. If the branch ruleset enables "Require review from
+# Code Owners", a review from the listed owner is required before merging.
+#
+# Syntax: <pattern> <owner1> [<owner2> ...]
+# Patterns follow gitignore semantics. Later rules override earlier ones.
+
+# Default owner for everything in the repository.
+*                       @nullnullnullnullnullnullnullnullnullnul
+
+# Android application module.
+/app/                   @nullnullnullnullnullnullnullnullnullnul
+
+# Native C++ engine (provably fair core, JNI bridge, CMake).
+/cpp_engine/            @nullnullnullnullnullnullnullnullnullnul
+
+# Build configuration at the repository root.
+/build.gradle.kts       @nullnullnullnullnullnullnullnullnullnul
+/settings.gradle.kts    @nullnullnullnullnullnullnullnullnullnul
+/gradle/                @nullnullnullnullnullnullnullnullnullnul
+
+# Repository governance, CI, and templates.
+/.github/               @nullnullnullnullnullnullnullnullnullnul
