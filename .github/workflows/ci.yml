@@ -1,0 +1,107 @@
+# Continuous integration for Stack Casino.
+#
+# Triggers:
+#   - pull_request to dev or main: gate the merge with a green build.
+#   - push to dev or main: validate the integration state after merge.
+#   - workflow_dispatch: allow manual runs from the Actions tab.
+#
+# Two jobs run in parallel:
+#   1. cpp-engine: configures, builds, and runs the desktop test executable
+#      for the native engine using CMake and the host toolchain. Confirms
+#      that the self-contained HMAC-SHA256 implementation still produces
+#      the expected outputs.
+#   2. android: sets up JDK, the Android SDK, NDK, and CMake, then builds
+#      the debug APK (which compiles libcasino-engine.so via CMake/NDK)
+#      and runs the JVM unit tests.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Cancel duplicate PR runs to save minutes; let push runs finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  cpp-engine:
+    name: cpp_engine desktop build and tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -S cpp_engine -B cpp_engine/build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build engine
+        run: cmake --build cpp_engine/build --parallel
+
+      - name: Run provably fair tests
+        run: ./cpp_engine/build/casino_test
+
+  android:
+    name: Android assemble and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK and NDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: >-
+            platform-tools
+            platforms;android-36
+            build-tools;36.0.0
+            ndk;27.0.12077973
+            cmake;3.22.1
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.event_name == 'pull_request' && github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main' }}
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Assemble debug APK
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Run JVM unit tests
+        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
+
+      - name: Upload debug APK
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload unit test reports
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-unit-test-reports
+          path: app/build/reports/tests/testDebugUnitTest/
+          if-no-files-found: ignore
+          retention-days: 14
