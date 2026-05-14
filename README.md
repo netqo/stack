@@ -4,11 +4,24 @@
 
 > A fully-featured Android casino simulator with a real crypto economy on Polygon. Configure your own house wallet, play with real USDC, and verify every result with Provably Fair cryptography, all without risking real money, since the operator controls both sides of the system.
 
+[![CI](https://github.com/nullnullnullnullnullnullnullnullnullnul/stack/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nullnullnullnullnullnullnullnullnullnul/stack/actions/workflows/ci.yml)
 ![Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white)
-![Min SDK](https://img.shields.io/badge/Min%20SDK-31-blue)
+![C++](https://img.shields.io/badge/Native-C%2B%2B17-00599C?logo=cplusplus&logoColor=white)
+![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white)
+![Min SDK](https://img.shields.io/badge/Min%20SDK-24-blue)
+![Target SDK](https://img.shields.io/badge/Target%20SDK-36-blue)
 ![Architecture](https://img.shields.io/badge/Architecture-MVVM-orange)
+![Provably Fair](https://img.shields.io/badge/Provably%20Fair-HMAC--SHA256-7B61FF)
+![Status](https://img.shields.io/badge/Status-Early%20Development-yellow)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
+![Last commit](https://img.shields.io/github/last-commit/nullnullnullnullnullnullnullnullnullnul/stack)
+![Top language](https://img.shields.io/github/languages/top/nullnullnullnullnullnullnullnullnullnul/stack)
+![Repo size](https://img.shields.io/github/repo-size/nullnullnullnullnullnullnullnullnullnul/stack)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-FE5196?logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org/en/v1.0.0/)
+[![Keep a Changelog](https://img.shields.io/badge/Keep%20a%20Changelog-1.1.0-E05735?logo=keepachangelog&logoColor=white)](https://keepachangelog.com/en/1.1.0/)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa)](CODE_OF_CONDUCT.md)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](.github/CONTRIBUTING.md)
 
 ---
 
