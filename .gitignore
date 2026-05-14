@@ -27,3 +27,6 @@ secrets.properties
 # Kotlin compiler cache
 .kotlin/
 google-services.json
+
+# IDE workspace state (Android Studio)
+/.idea/

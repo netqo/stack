@@ -1,4 +1,5 @@
 #include "ProvablyFairCore.h"
+#include "Sha256.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -6,8 +7,6 @@
 #include <cstring>
 #include <iomanip>
 #include <numeric>
-#include <openssl/evp.h>
-#include <openssl/hmac.h>
 #include <sstream>
 #include <vector>
 
@@ -16,35 +15,19 @@
 /**
  * @brief Generates an HMAC-SHA256 string representation.
  *
- * Uses the OpenSSL EVP API to hash the provided message string
- * with the server seed acting as the cryptographic key.
- *
- * @note Hex formatting uses a lookup table instead of std::stringstream,
- *       avoids the overhead of stream construction for a trivial conversion.
+ * Delegates to the self-contained casino::hmacSha256Hex implementation
+ * (Sha256.h). The previous OpenSSL-based path was replaced to remove the
+ * external dependency: the engine now builds identically on desktop (host)
+ * and Android (NDK) without needing libssl/libcrypto.
  *
  * @param key The secret key (Server Seed).
  * @param msg The target message to be hashed (Client Seed + Nonce).
- * @return std::string Hexadecimal lowercase output of the SHA256 digest.
+ * @return std::string Hexadecimal lowercase output of the SHA-256 digest.
  */
 std::string ProvablyFairCore::generateHMAC_SHA256(const std::string &key,
                                                   const std::string &msg)
 {
-  static constexpr char HEX_CHARS[] = "0123456789abcdef";
-  unsigned int digestLen = 0;
-  unsigned char *digest =
-      HMAC(EVP_sha256(), key.c_str(), key.length(),
-           reinterpret_cast<const unsigned char *>(msg.c_str()), msg.length(),
-           nullptr, &digestLen);
-  if (digest == nullptr)
-    throw std::runtime_error("HMAC-SHA256 computation failed");
-  std::string hexOutput;
-  hexOutput.reserve(digestLen * 2);
-  for (unsigned int i = 0; i < digestLen; ++i)
-  {
-    hexOutput += HEX_CHARS[(digest[i] >> 4) & 0x0F];
-    hexOutput += HEX_CHARS[digest[i] & 0x0F];
-  }
-  return hexOutput;
+  return casino::hmacSha256Hex(key, msg);
 }
 
 /**
