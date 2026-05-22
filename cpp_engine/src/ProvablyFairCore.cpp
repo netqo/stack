@@ -107,7 +107,13 @@ int ProvablyFairCore::selectUnbiasedIndex(const std::string &serverSeed,
                                           std::string &currentHashHex,
                                           int &chunkCounter, int range)
 {
-  while (true)
+  // For any plausible `range` (Mines uses up to 25, Blackjack uses up to 52),
+  // the per-chunk rejection probability is below 2e-8, so this loop is
+  // expected to return on the first iteration. The bound below guards
+  // against a broken entropy path producing an infinite loop: if it ever
+  // fires the result would be biased anyway, so throwing is the right
+  // failure mode.
+  for (int attempt = 0; attempt < REJECTION_SAFETY_LIMIT * 8; ++attempt)
   {
     size_t requiredOffset = static_cast<size_t>(
         chunkCounter * HEX_CHARS_PER_32BIT_BLOCK + HEX_CHARS_PER_32BIT_BLOCK);
@@ -125,6 +131,8 @@ int ProvablyFairCore::selectUnbiasedIndex(const std::string &serverSeed,
     if (val <= maxUnbiased)
       return static_cast<int>(val % range);
   }
+  throw std::runtime_error("selectUnbiasedIndex: rejection sampling exhausted; "
+                           "entropy source suspect");
 }
 
 /**
@@ -216,9 +224,17 @@ std::string ProvablyFairCore::calculateRoulette(const std::string &serverSeed,
       safetyCounter++;
     }
   }
-  // Extremely unlikely fallback to prevent absolute lock-ups
+  // The probability of every block in REJECTION_SAFETY_LIMIT consecutive
+  // rehashes being rejected is on the order of (9/65536)^(4*100), i.e.
+  // astronomically below 1e-1000. If it ever happens, the most likely cause
+  // is a bug in the entropy path, and silently returning 0 would bias the
+  // result toward zero. Refuse the round instead so the caller learns
+  // something is wrong rather than receiving a tainted outcome.
   if (result == -1)
-    result = 0;
+  {
+    throw std::runtime_error("calculateRoulette: rejection sampling exhausted; "
+                             "entropy source suspect");
+  }
   return std::to_string(result) + "|" + originalHashHex;
 }
 
