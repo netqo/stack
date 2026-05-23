@@ -17,7 +17,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.plainstudio.stackcasino.engine.NativeGameEngine
 import com.plainstudio.stackcasino.ui.theme.StackcasinoTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,20 +37,22 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun JniSmokeTest(modifier: Modifier = Modifier) {
     val engine = remember { NativeGameEngine() }
-    val coinflip = remember {
-        engine.evaluateCoinflip(
-            serverSeed = "test_server_seed",
-            clientSeed = "test_client_seed",
-            nonce = 1L,
-        )
-    }
-    val crash = remember {
-        engine.evaluateCrashPoint(
-            serverSeed = "test_server_seed",
-            clientSeed = "test_client_seed",
-            nonce = 1L,
-        )
-    }
+    val coinflip =
+        remember {
+            engine.evaluateCoinflip(
+                serverSeed = "test_server_seed",
+                clientSeed = "test_client_seed",
+                nonce = 1L,
+            )
+        }
+    val crash =
+        remember {
+            engine.evaluateCrashPoint(
+                serverSeed = "test_server_seed",
+                clientSeed = "test_client_seed",
+                nonce = 1L,
+            )
+        }
 
     Column(
         modifier = modifier.padding(16.dp),

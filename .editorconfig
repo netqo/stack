@@ -20,6 +20,9 @@ indent_size = 2
 indent_size = 4
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
+# Jetpack Compose composables and previews are PascalCase by convention;
+# disable ktlint's standard function-naming rule so they stop being flagged.
+ktlint_function_naming_ignore_when_annotated_with = Composable,Preview
 
 [*.{c,cc,cpp,cxx,h,hh,hpp,hxx}]
 indent_size = 2

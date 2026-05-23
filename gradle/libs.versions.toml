@@ -1,5 +1,5 @@
 [versions]
-agp = "9.1.1"
+agp = "8.13.2"
 coreKtx = "1.10.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -14,7 +14,7 @@ detekt = "1.23.7"
 
 # --- Entrega 2 catalog (declared here, linked per card) -------------------
 coroutines = "1.9.0"
-hilt = "2.53"
+hilt = "2.56"
 hiltNavigationCompose = "1.2.0"
 ksp = "2.2.10-2.0.2"
 navigationCompose = "2.8.5"
@@ -110,6 +110,7 @@ junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engi
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

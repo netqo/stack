@@ -19,7 +19,6 @@ package com.plainstudio.stackcasino.engine
  * [RuntimeException] for any other native failure.
  */
 class NativeGameEngine {
-
     external fun evaluateCoinflip(
         serverSeed: String,
         clientSeed: String,
