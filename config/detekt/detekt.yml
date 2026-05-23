@@ -1,0 +1,48 @@
+# Detekt configuration for Stack Casino.
+#
+# Layered on top of detekt's default rules (buildUponDefaultConfig = true in
+# the Gradle plugin). Anything not declared here inherits the default. The
+# goal is a strict baseline with Jetpack Compose friendliness: PascalCase
+# composables and Modifier-heavy parameter lists are allowed where they make
+# idiomatic sense, but nothing else is relaxed.
+
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+complexity:
+  LongMethod:
+    threshold: 80
+  LongParameterList:
+    functionThreshold: 8
+    constructorThreshold: 8
+    ignoreAnnotated: ['Composable']
+  TooManyFunctions:
+    thresholdInFiles: 30
+    thresholdInClasses: 20
+    thresholdInInterfaces: 15
+    thresholdInObjects: 15
+    thresholdInEnums: 15
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+  TopLevelPropertyNaming:
+    constantPattern: '[A-Z][_A-Z0-9]*|[A-Z][A-Za-z0-9]*'
+
+style:
+  MagicNumber:
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreAnnotation: true
+    ignoreEnums: true
+    ignoreNumbers: ['-1', '0', '1', '2']
+  MaxLineLength:
+    maxLineLength: 140
+  WildcardImport:
+    excludeImports:
+      - 'java.util.*'
+  ReturnCount:
+    max: 4
+  UnusedPrivateMember:
+    allowedNames: '_|ignored|expected|serialVersionUID'
