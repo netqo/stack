@@ -1,6 +1,6 @@
 # stack
 
-[![CI](https://github.com/nullnullnullnullnullnullnullnullnullnul/stack/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nullnullnullnullnullnullnullnullnullnul/stack/actions/workflows/ci.yml)
+[![CI](https://github.com/netqo/stack/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/netqo/stack/actions/workflows/ci.yml)
 ![Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white)
 ![C++17](https://img.shields.io/badge/Native-C%2B%2B17-00599C?logo=cplusplus&logoColor=white)
@@ -23,15 +23,22 @@ Provably-fair game-outcome engine in C++17 with Android JNI bindings. The engine
 | Desktop test harness                              | **implemented** (`cpp_engine/src/main.cpp`)                                                            |
 | Android NDK build to `libcasino-engine.so` (arm64-v8a, armeabi-v7a, x86, x86_64) | **implemented**                                                                                        |
 | JNI bridge + Kotlin `NativeGameEngine` facade     | **implemented** (`cpp_engine/src/native-lib.cpp`, `app/.../engine/NativeGameEngine.kt`)                |
-| `MainActivity` JNI smoke test                     | **implemented**                                                                                        |
-| Roulette / Blackjack / Crash / Mines game screens | **not implemented yet**                                                                                |
-| Wallet, USDC deposits/withdrawals on Polygon      | **not implemented yet**                                                                                |
-| Firebase Auth / Firestore / Cloud Functions       | **not implemented yet**                                                                                |
+| ktlint + detekt lint gating in CI                 | **implemented** (`config/detekt/detekt.yml`, dedicated `lint` job in `.github/workflows/ci.yml`)       |
+| Dependency catalog (Hilt, Navigation, Retrofit, Room, Firebase, Gemini, Glide, MockK, ...) | **implemented** (`gradle/libs.versions.toml`)                                                          |
+| Hilt DI scaffold (`StackCasinoApp`, `AppModule`, `@AndroidEntryPoint`) | **implemented** (`app/.../StackCasinoApp.kt`, `app/.../di/AppModule.kt`)                               |
+| Stack Casino dark design system (palette + MD3 type scale) | **implemented** (`app/.../ui/theme/`)                                                                  |
+| Compose Navigation graph (17 routes + bottom bar) | **implemented** (`app/.../navigation/`, `app/.../ui/components/StackBottomBar.kt`)                     |
+| Splash Screen API + auth-state gating             | **not implemented yet**                                                                                |
+| Firebase wiring (BoM, Auth, Firestore)            | **not implemented yet**                                                                                |
+| Google Sign-In via Credential Manager             | **not implemented yet**                                                                                |
+| Per-screen UI (Lobby, Wallet, History, Profile, games, KYC, News, Assistant) | **not implemented yet**                                                                                |
+| NewsAPI consumption + Room caching                | **not implemented yet**                                                                                |
+| Glide image loading                               | **not implemented yet**                                                                                |
 | Gemini-powered in-app assistant                   | **not implemented yet**                                                                                |
-| NewsAPI feed, Room caching                        | **not implemented yet**                                                                                |
 | Biometric-gated key storage                       | **not implemented yet**                                                                                |
+| On-chain integration (USDC, Polygon, Alchemy)     | **not implemented yet**                                                                                |
 
-What you can run today: the desktop test binary exercises every game algorithm and the input-validation paths; the Android app installs and the JNI smoke test confirms the native bridge round-trips strings through the engine.
+What you can run today: the desktop test binary exercises every game algorithm and the input-validation paths; the Android app installs, boots through the dark theme into a Compose `NavHost` whose 17 destinations resolve to labeled placeholders, and the bottom navigation bar walks across the five primary tabs.
 
 ## What the engine does
 
@@ -44,12 +51,17 @@ What you can run today: the desktop test binary exercises every game algorithm a
 ## Architecture
 
 ```
-UI (Jetpack Compose)                  -- planned
-        downward via StateFlow
-ViewModel + Repository layer          -- planned
+UI surface
+    Jetpack Compose + Material 3 (dark theme)                 -- IMPLEMENTED
+        StackApp -> Scaffold + StackBottomBar + StackNavHost  -- IMPLEMENTED (placeholders)
+        per-screen composables (Lobby, Wallet, ...)           -- planned
+
+App architecture
+    MVVM via Hilt (@HiltAndroidApp + AppModule)               -- IMPLEMENTED (scaffold only)
+    ViewModels + Repositories                                 -- planned
         |
-        +-- Room (single source of truth)             -- planned
-        +-- Retrofit / Firebase / Polygon RPC         -- planned
+        +-- Room (single source of truth)                     -- planned
+        +-- Retrofit / Firebase / Polygon RPC                 -- planned
 
 Game outcomes
     Kotlin NativeGameEngine ──JNI──► ProvablyFairCore (C++)   -- IMPLEMENTED
@@ -61,7 +73,7 @@ Game outcomes
                                        └── Blackjack (Fisher-Yates full shuffle)
 ```
 
-The lower half of the diagram is what compiles and runs today. The upper half (UI, repository, persistence, network) is the planned product surface described in the [Roadmap](#roadmap).
+What runs today is the UI scaffolding plus the engine; the per-screen composables, ViewModels, repositories and remote data sources are the planned product surface described in the [Roadmap](#roadmap).
 
 ## Build
 
@@ -79,9 +91,13 @@ The test binary prints 10 rounds for each game plus input-validation pass/fail. 
 
 ```bash
 ./gradlew assembleDebug
+./gradlew ktlintCheck detekt
+./gradlew :app:testDebugUnitTest
 ```
 
-This compiles `libcasino-engine.so` via the Android NDK for the four target ABIs (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) and bundles it into the debug APK. The app launches into a JNI smoke screen that calls `evaluateCoinflip` and `evaluateCrashPoint` once and renders the results.
+`assembleDebug` compiles `libcasino-engine.so` via the Android NDK for the four target ABIs (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) and bundles it into the debug APK. The app launches into the dark Stack Casino theme and a `NavHost` whose 17 destinations resolve to labeled placeholders; the five primary tabs (Lobby, Wallet, History, News, Profile) drive the bottom bar.
+
+`ktlintCheck detekt` enforces style and static-analysis gating; the same tasks run as the `lint` job in CI and gate the `android` job. `:app:testDebugUnitTest` runs the JVM unit tests (`StackCasinoAppTest`, `StackcasinoThemeTest`, `RouteTest`).
 
 Prerequisites: Android Studio (or the equivalent SDK + NDK + CMake bundle) and JDK 17.
 
