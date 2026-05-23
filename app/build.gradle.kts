@@ -1,14 +1,17 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
 }
 
 android {
     namespace = "com.plainstudio.stackcasino"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+        version =
+            release(36) {
+                minorApiLevel = 1
+            }
     }
 
     defaultConfig {
@@ -43,7 +46,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -53,6 +56,43 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+}
+
+ktlint {
+    version.set(libs.versions.ktlintTool.get())
+    android.set(true)
+    ignoreFailures.set(false)
+    filter {
+        exclude { entry -> entry.file.toString().contains("/build/") }
+        exclude { entry -> entry.file.toString().contains("/generated/") }
+    }
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    source.setFrom(
+        files(
+            "src/main/java",
+            "src/main/kotlin",
+            "src/test/java",
+            "src/test/kotlin",
+            "src/androidTest/java",
+            "src/androidTest/kotlin",
+        ),
+    )
+    parallel = true
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        txt.required.set(false)
+        sarif.required.set(false)
+        md.required.set(false)
     }
 }
 
