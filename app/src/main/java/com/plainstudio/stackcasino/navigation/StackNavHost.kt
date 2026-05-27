@@ -20,6 +20,8 @@ import com.plainstudio.stackcasino.feature.history.historyPreviewData
 import com.plainstudio.stackcasino.feature.lobby.LobbyScreen
 import com.plainstudio.stackcasino.feature.lobby.LobbyUiState
 import com.plainstudio.stackcasino.feature.lobby.previewLobbyData
+import com.plainstudio.stackcasino.feature.news.NewsDetailScreen
+import com.plainstudio.stackcasino.feature.news.NewsScreen
 import com.plainstudio.stackcasino.feature.wallet.WalletScreen
 import com.plainstudio.stackcasino.feature.wallet.previewWalletData
 
@@ -88,29 +90,41 @@ fun StackNavHost(
         composable(Route.Assistant.path) {
             AssistantScreen(onBack = { navController.popBackStack() })
         }
+        composable(Route.News.path) {
+            NewsScreen(
+                onOpenArticle = { articleId ->
+                    navController.navigate(Route.NewsDetail.build(articleId)) {
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
         PLACEHOLDER_ROUTES.forEach { (route, label) ->
             placeholderRoute(route, label)
         }
-        composable(
-            route = Route.RoundDetail.path,
-            arguments =
-                listOf(
-                    navArgument(Route.RoundDetail.ARG_ROUND_ID) { type = NavType.StringType },
-                ),
-        ) { entry ->
-            val id = entry.requireStringArg(Route.RoundDetail.ARG_ROUND_ID)
-            Placeholder("Round Detail · $id")
-        }
-        composable(
-            route = Route.NewsDetail.path,
-            arguments =
-                listOf(
-                    navArgument(Route.NewsDetail.ARG_ARTICLE_ID) { type = NavType.StringType },
-                ),
-        ) { entry ->
-            val id = entry.requireStringArg(Route.NewsDetail.ARG_ARTICLE_ID)
-            Placeholder("News Detail · $id")
-        }
+        addParametricRoutes(navController)
+    }
+}
+
+/**
+ * Routes with placeholders for their string argument. Kept out of the
+ * main [StackNavHost] body so the entry function stays under the
+ * detekt LongMethod budget and the parametric registrations group
+ * together for readers scanning the file top-down.
+ */
+private fun NavGraphBuilder.addParametricRoutes(navController: NavHostController) {
+    composable(
+        route = Route.RoundDetail.path,
+        arguments = listOf(navArgument(Route.RoundDetail.ARG_ROUND_ID) { type = NavType.StringType }),
+    ) { entry ->
+        val id = entry.requireStringArg(Route.RoundDetail.ARG_ROUND_ID)
+        Placeholder("Round Detail · $id")
+    }
+    composable(
+        route = Route.NewsDetail.path,
+        arguments = listOf(navArgument(Route.NewsDetail.ARG_ARTICLE_ID) { type = NavType.StringType }),
+    ) {
+        NewsDetailScreen(onBack = { navController.popBackStack() })
     }
 }
 
@@ -122,7 +136,6 @@ fun StackNavHost(
 private val PLACEHOLDER_ROUTES: List<Pair<Route, String>> =
     listOf(
         Route.HouseWallet to "House Wallet",
-        Route.News to "News",
         Route.Profile to "Profile",
         Route.Kyc to "KYC",
         Route.Coinflip to "Coinflip",

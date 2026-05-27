@@ -21,6 +21,7 @@ val localProperties =
     }
 val googleWebClientId: String = localProperties.getProperty("GOOGLE_WEB_CLIENT_ID", "")
 val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY", "")
+val newsApiKey: String = localProperties.getProperty("NEWSAPI_KEY", "")
 
 android {
     namespace = "com.plainstudio.stackcasino"
@@ -38,6 +39,7 @@ android {
 
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
         buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
+        buildConfigField("String", "NEWSAPI_KEY", "\"$newsApiKey\"")
 
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
@@ -143,6 +145,14 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.google.generativeai)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.moshi)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.glide)
+    implementation(libs.glide.compose)
+    ksp(libs.moshi.kotlin.codegen)
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

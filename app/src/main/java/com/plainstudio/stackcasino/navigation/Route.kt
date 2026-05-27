@@ -53,7 +53,11 @@ sealed class Route(
     data object NewsDetail : Route("news/{articleId}") {
         const val ARG_ARTICLE_ID = "articleId"
 
-        fun build(articleId: String): String = "news/$articleId"
+        // NewsAPI returns the article URL as the only stable id, so the
+        // path arg has to survive the colons + slashes of a real URL.
+        // We URL-encode at build time and let the consuming ViewModel
+        // decode on the way out.
+        fun build(articleId: String): String = "news/${android.net.Uri.encode(articleId)}"
     }
 }
 
