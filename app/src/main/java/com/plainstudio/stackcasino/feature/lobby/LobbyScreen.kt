@@ -537,6 +537,9 @@ private fun GameCard(
                 fontWeight = FontWeight.SemiBold,
             )
             Spacer(modifier = Modifier.height(8.dp))
+            // alignByBaseline keeps the two labels typographically level
+            // even though the right side uses `tnum` digits that report
+            // slightly different line metrics than the plain-letter left.
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -546,6 +549,7 @@ private fun GameCard(
                     color = TextLow,
                     fontSize = SmallMetaFontSize,
                     letterSpacing = TrackedLetterSpacing,
+                    modifier = Modifier.alignByBaseline(),
                 )
                 Text(
                     text = card.infoRight.uppercase(),
@@ -553,6 +557,7 @@ private fun GameCard(
                     fontSize = SmallMetaFontSize,
                     letterSpacing = TrackedLetterSpacing,
                     style = TextStyle(fontFeatureSettings = "tnum"),
+                    modifier = Modifier.alignByBaseline(),
                 )
             }
         }
@@ -629,11 +634,16 @@ private fun CoinflipCard(
                     letterSpacing = TrackedLetterSpacing,
                 )
             }
+            // Aligns with the subtitle line of the left column instead of
+            // the row centre so the meta label sits on the same baseline
+            // as X2 PAYOUT (mockup line 173 leaves both labels at the
+            // foot of the card).
             Text(
                 text = card.infoRight.uppercase(),
                 color = TextLow,
                 fontSize = MetaFontSize,
                 letterSpacing = TrackedLetterSpacing,
+                modifier = Modifier.align(Alignment.Bottom),
             )
         }
     }
