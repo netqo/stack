@@ -1,0 +1,19 @@
+<!--
+  Generic article glyph rendered behind missing or in-flight Glide
+  images. Mirrors the "article" iconography used elsewhere in the
+  app and stays neutral so it reads as a placeholder rather than a
+  real cover.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3F3D55"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M5,4 h14 v16 h-14 z M8,8 h8 M8,12 h8 M8,16 h5" />
+</vector>

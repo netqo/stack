@@ -22,7 +22,16 @@ class RouteTest {
 
     @Test
     fun newsDetail_build_inserts_id_into_path_pattern() {
+        // Simple ids stay readable.
         assertEquals("news/article-7", Route.NewsDetail.build("article-7"))
+        // NewsAPI returns the article URL as the id; the build helper
+        // must URL-encode it so the path arg survives the Compose
+        // Navigation matcher (colons and slashes would otherwise
+        // collide with the route template).
+        assertEquals(
+            "news/https%3A%2F%2Fexample.com%2Fa%2Fb",
+            Route.NewsDetail.build("https://example.com/a/b"),
+        )
         assertTrue(
             "Pattern must contain the argument placeholder.",
             Route.NewsDetail.path.contains("{${Route.NewsDetail.ARG_ARTICLE_ID}}"),

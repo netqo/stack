@@ -53,7 +53,20 @@ sealed class Route(
     data object NewsDetail : Route("news/{articleId}") {
         const val ARG_ARTICLE_ID = "articleId"
 
-        fun build(articleId: String): String = "news/$articleId"
+        // NewsAPI returns the article URL as the only stable id, so the
+        // path arg has to survive the colons + slashes of a real URL.
+        // URLEncoder is used (vs android.net.Uri.encode) so the helper
+        // also works under plain JVM unit tests where the Android stub
+        // would return null. The +-to-%20 swap brings the output to
+        // RFC 3986 path encoding because URLEncoder encodes spaces as
+        // `+` (form-encoding) by default.
+        fun build(articleId: String): String {
+            val encoded =
+                java.net.URLEncoder
+                    .encode(articleId, java.nio.charset.StandardCharsets.UTF_8)
+                    .replace("+", "%20")
+            return "news/$encoded"
+        }
     }
 }
 
