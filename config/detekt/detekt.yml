@@ -37,6 +37,9 @@ style:
     ignoreAnnotation: true
     ignoreEnums: true
     ignoreNumbers: ['-1', '0', '1', '2']
+    # @Preview composables are throwaway demo wiring; fractional widths
+    # and sample padding there are not load-bearing constants.
+    ignoreAnnotated: ['Preview']
   MaxLineLength:
     maxLineLength: 140
   WildcardImport:
