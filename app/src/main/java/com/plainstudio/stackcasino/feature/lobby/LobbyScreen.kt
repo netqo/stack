@@ -148,7 +148,7 @@ private fun SuccessContent(
     ) {
         LobbyHeader(
             user = data.user,
-            onOpenNotifications = { /* notifications sheet deferred */ },
+            onOpenNotifications = {},
         )
         Divider()
         BalanceHero(
@@ -1027,10 +1027,7 @@ private fun GameKey.iconRes(): Int =
         GameKey.Blackjack -> R.drawable.ic_game_blackjack
         GameKey.Crash -> R.drawable.ic_game_crash
         GameKey.Mines -> R.drawable.ic_game_mines
-        // Coinflip uses the inline "x2" badge in CoinflipCard instead of a
-        // drawable; this is dead for the grid path but kept to make the
-        // when-exhaustive contract honest.
-        GameKey.Coinflip -> R.drawable.ic_game_crash
+        GameKey.Coinflip -> R.drawable.ic_game_coinflip
     }
 
 private fun initialsOf(name: String): String {
