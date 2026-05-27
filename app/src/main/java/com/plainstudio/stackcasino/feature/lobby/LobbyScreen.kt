@@ -19,19 +19,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.ArrowDownward
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.plainstudio.stackcasino.R
 import com.plainstudio.stackcasino.navigation.Route
 import com.plainstudio.stackcasino.ui.components.BalancePill
+import com.plainstudio.stackcasino.ui.components.CurrencyDropdown
 import com.plainstudio.stackcasino.ui.components.ErrorState
 import com.plainstudio.stackcasino.ui.components.ErrorStateDefaults
 import com.plainstudio.stackcasino.ui.components.Skeleton
@@ -59,7 +56,6 @@ import com.plainstudio.stackcasino.ui.theme.SemanticOk
 import com.plainstudio.stackcasino.ui.theme.SemanticWarn
 import com.plainstudio.stackcasino.ui.theme.StackcasinoTheme
 import com.plainstudio.stackcasino.ui.theme.SurfaceBase
-import com.plainstudio.stackcasino.ui.theme.SurfaceElevated
 import com.plainstudio.stackcasino.ui.theme.SurfaceOutline
 import com.plainstudio.stackcasino.ui.theme.SurfaceRaised
 import com.plainstudio.stackcasino.ui.theme.TextHigh
@@ -360,74 +356,6 @@ private fun PnLChip(
             letterSpacing = TrackedLetterSpacing,
             style = TextStyle(fontFeatureSettings = "tnum"),
         )
-    }
-}
-
-/**
- * Currency picker. Tapping toggles a DropdownMenu listing USDC + USDT;
- * picking an option updates the visible code. Network label stays put
- * because both currencies live on Polygon in the mockup.
- */
-@Composable
-private fun CurrencyDropdown(
-    initialCurrency: String,
-    networkLabel: String,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    var selected by rememberSaveable { mutableStateOf(initialCurrency) }
-    Box {
-        Row(
-            modifier = Modifier.clickable { expanded = true },
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(
-                text = "$selected · $networkLabel",
-                color = TextLow,
-                fontSize = MetaFontSize,
-                letterSpacing = TrackedLetterSpacing,
-            )
-            Icon(
-                imageVector = Icons.Filled.KeyboardArrowDown,
-                contentDescription = null,
-                tint = TextLow,
-                modifier = Modifier.size(CurrencyChevronSize),
-            )
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.background(SurfaceElevated),
-        ) {
-            CurrencyOptions.forEach { code ->
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Box(
-                                modifier =
-                                    Modifier
-                                        .size(CurrencyDotSize)
-                                        .background(if (code == selected) AccentViolet else Color.Transparent),
-                            )
-                            Text(
-                                text = code,
-                                color = if (code == selected) AccentViolet else TextHigh,
-                                fontSize = MetaFontSize,
-                                fontWeight = FontWeight.SemiBold,
-                                letterSpacing = TrackedLetterSpacing,
-                            )
-                        }
-                    },
-                    onClick = {
-                        selected = code
-                        expanded = false
-                    },
-                )
-            }
-        }
     }
 }
 
@@ -1086,10 +1014,6 @@ private val RecentSkeletonHeight = 56.dp
 private const val RECENT_SKELETON_COUNT = 3
 
 private val ViewAllChevronSize = 12.dp
-private val CurrencyChevronSize = 10.dp
-private val CurrencyDotSize = 6.dp
-
-private val CurrencyOptions = listOf("USDC", "USDT")
 
 private val NepFabSize = 48.dp
 private val NepFabBorderWidth = 2.dp
