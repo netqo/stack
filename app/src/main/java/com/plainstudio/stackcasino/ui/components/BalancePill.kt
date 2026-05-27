@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,15 +63,29 @@ fun BalancePill(
                 fontSize = LabelFontSize,
                 letterSpacing = LabelLetterSpacing,
             )
-            Text(
-                text = if (isHidden) HIDDEN_PLACEHOLDER else amount,
-                color = TextHigh,
-                fontSize = AmountFontSize,
-                fontWeight = FontWeight.Bold,
-                // tabular-nums keeps the digits monospaced so amounts
-                // don't shift width when a single digit changes.
-                style = TextStyle(fontFeatureSettings = "tnum"),
-            )
+            // Both versions share the same slot so toggling visibility
+            // never shifts surrounding layout. Mirrors the mockup recipe
+            // (mockup/js/screens/lobby.js line 57: bal-stack inline-grid
+            // col-start-1 row-start-1).
+            Box {
+                Text(
+                    text = amount,
+                    modifier = Modifier.alpha(if (isHidden) 0f else 1f),
+                    color = TextHigh,
+                    fontSize = AmountFontSize,
+                    fontWeight = FontWeight.Bold,
+                    // tabular-nums keeps the digits monospaced so amounts
+                    // don't shift width when a single digit changes.
+                    style = TextStyle(fontFeatureSettings = "tnum"),
+                )
+                Text(
+                    text = HIDDEN_PLACEHOLDER,
+                    modifier = Modifier.alpha(if (isHidden) 1f else 0f),
+                    color = TextLow,
+                    fontSize = AmountFontSize,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         }
         if (onToggleVisibility != null) {
             Box(

@@ -14,6 +14,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.plainstudio.stackcasino.feature.auth.LoginScreen
+import com.plainstudio.stackcasino.feature.lobby.LobbyScreen
+import com.plainstudio.stackcasino.feature.lobby.LobbyUiState
+import com.plainstudio.stackcasino.feature.lobby.previewLobbyData
 
 /**
  * Wires every [Route] into a single Compose nav graph. Routes that
@@ -49,6 +52,16 @@ fun StackNavHost(
                 },
             )
         }
+        composable(Route.Lobby.path) {
+            LobbyScreen(
+                state = LobbyUiState.Success(previewLobbyData()),
+                onNavigate = { route ->
+                    navController.navigate(route.path) { launchSingleTop = true }
+                },
+                onRetry = {},
+                onUseCache = {},
+            )
+        }
         PLACEHOLDER_ROUTES.forEach { (route, label) ->
             placeholderRoute(route, label)
         }
@@ -82,7 +95,6 @@ fun StackNavHost(
  */
 private val PLACEHOLDER_ROUTES: List<Pair<Route, String>> =
     listOf(
-        Route.Lobby to "Lobby",
         Route.Wallet to "Wallet",
         Route.HouseWallet to "House Wallet",
         Route.History to "History",

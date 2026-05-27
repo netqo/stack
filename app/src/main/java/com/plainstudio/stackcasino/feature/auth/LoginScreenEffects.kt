@@ -59,47 +59,6 @@ internal fun Modifier.backgroundGlow(): Modifier =
         drawRect(brush = bottomGlow)
     }
 
-/**
- * Subtle 24dp dotted grid. Mockup CSS (styles.css):
- *
- *   .grid-bg {
- *     background-image:
- *       linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
- *       linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
- *     background-size: 24px 24px;
- *   }
- *
- * The mockup wraps the grid div with `opacity-40` which would bring the
- * effective alpha down to ~0.014; we keep the underlying 0.035 because
- * the violet glow saturates the surface and a slightly stronger grid
- * stays perceptible.
- */
-internal fun Modifier.gridBackground(): Modifier =
-    drawBehind {
-        val cellPx = GridCellSize.toPx()
-        val strokePx = GridLineWidth.toPx()
-        var x = 0f
-        while (x <= size.width) {
-            drawLine(
-                color = GridLineColor,
-                start = Offset(x, 0f),
-                end = Offset(x, size.height),
-                strokeWidth = strokePx,
-            )
-            x += cellPx
-        }
-        var y = 0f
-        while (y <= size.height) {
-            drawLine(
-                color = GridLineColor,
-                start = Offset(0f, y),
-                end = Offset(size.width, y),
-                strokeWidth = strokePx,
-            )
-            y += cellPx
-        }
-    }
-
 // ---------------------------------------------------------------------------
 // Brand glow shadow (sign-in / loading button)
 // ---------------------------------------------------------------------------
@@ -270,11 +229,6 @@ private const val BOTTOM_GLOW_ALPHA = 0.08f
 private const val BOTTOM_GLOW_CENTER_X_FRACTION = 0.2f
 private const val BOTTOM_GLOW_CENTER_Y_FRACTION = 0.9f
 private const val BOTTOM_GLOW_RADIUS_FRACTION = 0.55f
-
-// Grid background.
-private val GridLineColor = Color.White.copy(alpha = 0.035f)
-private val GridCellSize = 24.dp
-private val GridLineWidth = 1.dp
 
 // Brand glow shadow.
 private val ButtonGlowColor = AccentViolet.copy(alpha = 0.35f)

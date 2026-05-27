@@ -1,0 +1,18 @@
+<!--
+  Filled spade. Mockup spec (mockup/js/screens/lobby.js, line 124):
+    <path d="M12 3l6 8c2 3 0 7-3 7-1.5 0-2.5-0.7-3-2-0.5 1.3-1.5 2-3 2-3 0-5-4-3-7l6-8z"/>
+  Tinted by the Icon composable.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M12,3 l6,8 c2,3 0,7 -3,7 c-1.5,0 -2.5,-0.7 -3,-2 c-0.5,1.3 -1.5,2 -3,2 c-3,0 -5,-4 -3,-7 l6,-8 z" />
+</vector>
