@@ -27,8 +27,8 @@ Provably-fair game-outcome engine in C++17 with Android JNI bindings. The engine
 | Dependency catalog (Hilt, Navigation, Retrofit, Room, Firebase, Gemini, Glide, MockK, ...) | **implemented** (`gradle/libs.versions.toml`)                                                          |
 | Hilt DI scaffold (`StackCasinoApp`, `AppModule`, `@AndroidEntryPoint`) | **implemented** (`app/.../StackCasinoApp.kt`, `app/.../di/AppModule.kt`)                               |
 | Stack Casino dark design system (palette + MD3 type scale) | **implemented** (`app/.../ui/theme/`)                                                                  |
-| Compose Navigation graph (17 routes + bottom bar) | **implemented** (`app/.../navigation/`, `app/.../ui/components/StackBottomBar.kt`)                     |
-| Splash Screen API + auth-state gating             | **not implemented yet**                                                                                |
+| Compose Navigation graph (16 routes + bottom bar) | **implemented** (`app/.../navigation/`, `app/.../ui/components/StackBottomBar.kt`)                     |
+| Splash Screen API + auth-state gating             | **implemented** (`Theme.Stackcasino.Splash` + `SplashViewModel` resolves Firebase session into Login/Lobby start destination) |
 | Firebase wiring (BoM, Auth, Firestore, Analytics) | **implemented** (Hilt providers in `app/.../di/AppModule.kt`, no feature consumers yet)                |
 | Google Sign-In via Credential Manager             | **not implemented yet**                                                                                |
 | Per-screen UI (Lobby, Wallet, History, Profile, games, KYC, News, Assistant) | **not implemented yet**                                                                                |
@@ -38,7 +38,7 @@ Provably-fair game-outcome engine in C++17 with Android JNI bindings. The engine
 | Biometric-gated key storage                       | **not implemented yet**                                                                                |
 | On-chain integration (USDC, Polygon, Alchemy)     | **not implemented yet**                                                                                |
 
-What you can run today: the desktop test binary exercises every game algorithm and the input-validation paths; the Android app installs, boots through the dark theme into a Compose `NavHost` whose 17 destinations resolve to labeled placeholders, and the bottom navigation bar walks across the five primary tabs.
+What you can run today: the desktop test binary exercises every game algorithm and the input-validation paths; the Android app installs, shows the AndroidX SplashScreen with the brand icon on the SurfaceBase background, then `SplashViewModel` reads the cached Firebase Auth state and routes to either Login (no session) or Lobby (session persisted). From there the Compose `NavHost` exposes 16 destinations as labeled placeholders and the bottom navigation bar walks across the five primary tabs.
 
 ## What the engine does
 
@@ -95,9 +95,9 @@ The test binary prints 10 rounds for each game plus input-validation pass/fail. 
 ./gradlew :app:testDebugUnitTest
 ```
 
-`assembleDebug` compiles `libcasino-engine.so` via the Android NDK for the four target ABIs (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) and bundles it into the debug APK. The app launches into the dark Stack Casino theme and a `NavHost` whose 17 destinations resolve to labeled placeholders; the five primary tabs (Lobby, Wallet, History, News, Profile) drive the bottom bar.
+`assembleDebug` compiles `libcasino-engine.so` via the Android NDK for the four target ABIs (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) and bundles it into the debug APK. The app launches into the AndroidX SplashScreen, `SplashViewModel` resolves the cached Firebase session, then routes to Login or Lobby; the five primary tabs (Lobby, Wallet, History, News, Profile) drive the bottom bar.
 
-`ktlintCheck detekt` enforces style and static-analysis gating; the same tasks run as the `lint` job in CI and gate the `android` job. `:app:testDebugUnitTest` runs the JVM unit tests (`StackCasinoAppTest`, `StackcasinoThemeTest`, `RouteTest`).
+`ktlintCheck detekt` enforces style and static-analysis gating; the same tasks run as the `lint` job in CI and gate the `android` job. `:app:testDebugUnitTest` runs the JVM unit tests (`StackCasinoAppTest`, `StackcasinoThemeTest`, `RouteTest`, `StartDestinationTest`, `SplashViewModelTest`).
 
 Prerequisites: Android Studio (or the equivalent SDK + NDK + CMake bundle) and JDK 17.
 

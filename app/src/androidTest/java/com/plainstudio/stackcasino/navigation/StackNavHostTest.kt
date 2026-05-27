@@ -30,12 +30,11 @@ class StackNavHostTest {
                 TestNavHostController(ApplicationProvider.getApplicationContext()).apply {
                     navigatorProvider.addNavigator(androidx.navigation.compose.ComposeNavigator())
                 }
-            StackNavHost(navController = navController)
+            StackNavHost(navController = navController, startDestination = Route.Login.path)
         }
 
         val staticTargets =
             listOf(
-                Route.Splash,
                 Route.Login,
                 Route.Lobby,
                 Route.Wallet,
@@ -70,7 +69,7 @@ class StackNavHostTest {
                 TestNavHostController(ApplicationProvider.getApplicationContext()).apply {
                     navigatorProvider.addNavigator(androidx.navigation.compose.ComposeNavigator())
                 }
-            StackNavHost(navController = navController)
+            StackNavHost(navController = navController, startDestination = Route.Login.path)
         }
 
         composeRule.runOnUiThread { navController.navigate(Route.RoundDetail.build("round-42")) }

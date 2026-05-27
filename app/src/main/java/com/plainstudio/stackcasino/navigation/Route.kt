@@ -16,8 +16,6 @@ package com.plainstudio.stackcasino.navigation
 sealed class Route(
     val path: String,
 ) {
-    data object Splash : Route("splash")
-
     data object Login : Route("login")
 
     data object Lobby : Route("lobby")
