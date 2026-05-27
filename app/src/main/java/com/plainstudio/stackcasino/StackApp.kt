@@ -41,7 +41,10 @@ fun StackApp(startDestination: StartDestination) {
                     StackBottomBar(
                         currentRoute = currentRoute,
                         onTabSelected = { tab ->
-                            navController.navigate(tab.route.path) {
+                            // defaultPath instead of path so parametric tabs
+                            // (Wallet) navigate to the bare destination
+                            // without dragging the {tab} placeholder along.
+                            navController.navigate(tab.route.defaultPath) {
                                 popUpTo(Route.Lobby.path) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true

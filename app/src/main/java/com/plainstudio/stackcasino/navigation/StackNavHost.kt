@@ -23,6 +23,7 @@ import com.plainstudio.stackcasino.feature.lobby.previewLobbyData
 import com.plainstudio.stackcasino.feature.news.NewsDetailScreen
 import com.plainstudio.stackcasino.feature.news.NewsScreen
 import com.plainstudio.stackcasino.feature.wallet.WalletScreen
+import com.plainstudio.stackcasino.feature.wallet.WalletTab
 import com.plainstudio.stackcasino.feature.wallet.previewWalletData
 
 /**
@@ -63,20 +64,16 @@ fun StackNavHost(
             LobbyScreen(
                 state = LobbyUiState.Success(previewLobbyData()),
                 onNavigate = { route ->
-                    navController.navigate(route.path) { launchSingleTop = true }
+                    navController.navigate(route.defaultPath) { launchSingleTop = true }
+                },
+                onOpenWallet = { tab ->
+                    navController.navigate(Route.Wallet.build(tab)) { launchSingleTop = true }
                 },
                 onRetry = {},
                 onUseCache = {},
             )
         }
-        composable(Route.Wallet.path) {
-            WalletScreen(
-                data = previewWalletData(),
-                onNavigate = { route ->
-                    navController.navigate(route.path) { launchSingleTop = true }
-                },
-            )
-        }
+        addWalletRoute(navController)
         composable(Route.History.path) {
             HistoryScreen(
                 data = historyPreviewData(),
@@ -103,6 +100,38 @@ fun StackNavHost(
             placeholderRoute(route, label)
         }
         addParametricRoutes(navController)
+    }
+}
+
+/**
+ * Wallet has an optional `tab` query arg so the lobby quick actions
+ * can deep-link to Deposit / Withdraw; navigating to plain "wallet"
+ * lands on the default Deposit tab. Pulled out of [StackNavHost] so
+ * the entry function stays under the detekt LongMethod budget.
+ */
+private fun NavGraphBuilder.addWalletRoute(navController: NavHostController) {
+    composable(
+        route = Route.Wallet.path,
+        arguments =
+            listOf(
+                navArgument(Route.Wallet.ARG_TAB) {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+            ),
+    ) { entry ->
+        val tabName = entry.arguments?.getString(Route.Wallet.ARG_TAB)
+        val initialTab =
+            tabName?.let { runCatching { WalletTab.valueOf(it) }.getOrNull() }
+                ?: WalletTab.Deposit
+        WalletScreen(
+            data = previewWalletData(),
+            initialTab = initialTab,
+            onNavigate = { route ->
+                navController.navigate(route.defaultPath) { launchSingleTop = true }
+            },
+        )
     }
 }
 

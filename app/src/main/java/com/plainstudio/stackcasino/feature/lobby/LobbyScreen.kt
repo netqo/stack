@@ -84,6 +84,7 @@ import com.plainstudio.stackcasino.ui.theme.TextMedium
 fun LobbyScreen(
     state: LobbyUiState,
     onNavigate: (Route) -> Unit,
+    onOpenWallet: (initialTab: String?) -> Unit,
     onRetry: () -> Unit,
     onUseCache: () -> Unit,
     modifier: Modifier = Modifier,
@@ -91,6 +92,7 @@ fun LobbyScreen(
     LobbyContent(
         state = state,
         onNavigate = onNavigate,
+        onOpenWallet = onOpenWallet,
         onRetry = onRetry,
         onUseCache = onUseCache,
         modifier = modifier,
@@ -101,6 +103,7 @@ fun LobbyScreen(
 private fun LobbyContent(
     state: LobbyUiState,
     onNavigate: (Route) -> Unit,
+    onOpenWallet: (initialTab: String?) -> Unit,
     onRetry: () -> Unit,
     onUseCache: () -> Unit,
     modifier: Modifier = Modifier,
@@ -112,6 +115,7 @@ private fun LobbyContent(
                     SuccessContent(
                         data = state.data,
                         onNavigate = onNavigate,
+                        onOpenWallet = onOpenWallet,
                     )
                 LobbyUiState.Loading -> LoadingContent()
                 is LobbyUiState.Error ->
@@ -139,6 +143,7 @@ private fun LobbyContent(
 private fun SuccessContent(
     data: LobbyData,
     onNavigate: (Route) -> Unit,
+    onOpenWallet: (initialTab: String?) -> Unit,
 ) {
     var isBalanceHidden by rememberSaveable { mutableStateOf(false) }
     Column(
@@ -161,7 +166,10 @@ private fun SuccessContent(
             onSelectGame = { onNavigate(it.toRoute()) },
         )
         Divider()
-        QuickActionsSection(onOpenWallet = { onNavigate(Route.Wallet) })
+        QuickActionsSection(
+            onOpenDeposit = { onOpenWallet(QUICK_ACTION_TAB_DEPOSIT) },
+            onOpenWithdraw = { onOpenWallet(QUICK_ACTION_TAB_WITHDRAW) },
+        )
         Divider()
         RecentActivitySection(
             rounds = data.recentActivity,
@@ -584,7 +592,10 @@ private fun CoinflipCard(
 // ---------------------------------------------------------------------------
 
 @Composable
-private fun QuickActionsSection(onOpenWallet: () -> Unit) {
+private fun QuickActionsSection(
+    onOpenDeposit: () -> Unit,
+    onOpenWithdraw: () -> Unit,
+) {
     Column(
         modifier =
             Modifier
@@ -607,7 +618,7 @@ private fun QuickActionsSection(onOpenWallet: () -> Unit) {
                 subtitle = "Receive crypto",
                 accent = SemanticOk,
                 isDeposit = true,
-                onClick = onOpenWallet,
+                onClick = onOpenDeposit,
                 modifier = Modifier.weight(1f),
             )
             QuickActionCard(
@@ -615,12 +626,17 @@ private fun QuickActionsSection(onOpenWallet: () -> Unit) {
                 subtitle = "Send to address",
                 accent = SemanticWarn,
                 isDeposit = false,
-                onClick = onOpenWallet,
+                onClick = onOpenWithdraw,
                 modifier = Modifier.weight(1f),
             )
         }
     }
 }
+
+// Tab keys the lobby passes back to the nav-host so wallet deep-links
+// land on the right pane. Match [WalletTab.name.lowercase()].
+internal const val QUICK_ACTION_TAB_DEPOSIT = "Deposit"
+internal const val QUICK_ACTION_TAB_WITHDRAW = "Withdraw"
 
 @Composable
 private fun QuickActionCard(
@@ -1050,6 +1066,7 @@ private fun LobbyScreenSuccessPreview() {
         LobbyScreen(
             state = LobbyUiState.Success(previewLobbyData()),
             onNavigate = {},
+            onOpenWallet = {},
             onRetry = {},
             onUseCache = {},
         )
@@ -1063,6 +1080,7 @@ private fun LobbyScreenLoadingPreview() {
         LobbyScreen(
             state = LobbyUiState.Loading,
             onNavigate = {},
+            onOpenWallet = {},
             onRetry = {},
             onUseCache = {},
         )
@@ -1080,6 +1098,7 @@ private fun LobbyScreenErrorPreview() {
                     lastSyncedLabel = "Last synced 4 minutes ago",
                 ),
             onNavigate = {},
+            onOpenWallet = {},
             onRetry = {},
             onUseCache = {},
         )
