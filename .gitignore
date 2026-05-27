@@ -14,8 +14,11 @@
 .cxx
 local.properties
 
-# Firebase / Google Services
-app/google-services.json
+# google-services.json is intentionally committed: the project keys it
+# contains are protected at runtime by Firebase Security Rules + App
+# Check rather than by client-side secrecy, and CI needs it to build
+# the debug APK. See README "Firebase setup" for the SHA-1 pinning
+# that gates Google Sign-In and Storage access.
 
 # Secrets file pattern
 secrets.properties
@@ -26,7 +29,6 @@ secrets.properties
 
 # Kotlin compiler cache
 .kotlin/
-google-services.json
 
 # IDE workspace state (Android Studio)
 /.idea/
