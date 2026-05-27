@@ -1,0 +1,19 @@
+<!--
+  Wallet outline with the small clasp on the right edge. Ported from
+  mockup/js/components.js bottomNav.icons.wallet:
+    <rect x="3" y="6" width="18" height="14"/>
+    <path d="M16 13h3"/>
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M3,6 h18 v14 h-18 z M16,13 h3" />
+</vector>
