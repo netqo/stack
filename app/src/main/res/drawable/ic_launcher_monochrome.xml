@@ -1,10 +1,9 @@
 <!--
-  Adaptive-icon foreground for Stack Casino. Ports the layered-squares
-  brand glyph that the login hero uses (LoginScreen.StackLogoGlyph):
-  outer violet border, middle violet-soft border, inner filled violet
-  core. Sized to fit inside the adaptive-icon safe zone (the central
-  66dp circle of the 108dp viewport) so the corners survive round and
-  squircle launcher masks.
+  Single-tint variant of the brand glyph used by Android 13+ themed
+  icons. The platform recolors every non-transparent pixel with the
+  user's theme palette, so the three brand layers collapse to one
+  ink colour here. Layout matches ic_launcher_foreground so the
+  themed and full-colour variants line up across launchers.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -13,15 +12,15 @@
     android:viewportHeight="108">
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#8B5CF6"
+        android:strokeColor="#FFFFFF"
         android:strokeWidth="3"
         android:pathData="M32,32 h44 v44 h-44 z" />
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#A78BFA"
+        android:strokeColor="#FFFFFF"
         android:strokeWidth="1.5"
         android:pathData="M38,38 h32 v32 h-32 z" />
     <path
-        android:fillColor="#8B5CF6"
+        android:fillColor="#FFFFFF"
         android:pathData="M46,46 h16 v16 h-16 z" />
 </vector>
