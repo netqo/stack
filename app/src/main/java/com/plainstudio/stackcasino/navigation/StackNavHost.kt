@@ -17,6 +17,8 @@ import com.plainstudio.stackcasino.feature.auth.LoginScreen
 import com.plainstudio.stackcasino.feature.lobby.LobbyScreen
 import com.plainstudio.stackcasino.feature.lobby.LobbyUiState
 import com.plainstudio.stackcasino.feature.lobby.previewLobbyData
+import com.plainstudio.stackcasino.feature.wallet.WalletScreen
+import com.plainstudio.stackcasino.feature.wallet.previewWalletData
 
 /**
  * Wires every [Route] into a single Compose nav graph. Routes that
@@ -62,6 +64,14 @@ fun StackNavHost(
                 onUseCache = {},
             )
         }
+        composable(Route.Wallet.path) {
+            WalletScreen(
+                data = previewWalletData(),
+                onNavigate = { route ->
+                    navController.navigate(route.path) { launchSingleTop = true }
+                },
+            )
+        }
         PLACEHOLDER_ROUTES.forEach { (route, label) ->
             placeholderRoute(route, label)
         }
@@ -95,7 +105,6 @@ fun StackNavHost(
  */
 private val PLACEHOLDER_ROUTES: List<Pair<Route, String>> =
     listOf(
-        Route.Wallet to "Wallet",
         Route.HouseWallet to "House Wallet",
         Route.History to "History",
         Route.News to "News",
