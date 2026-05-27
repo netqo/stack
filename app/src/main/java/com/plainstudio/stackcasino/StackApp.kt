@@ -37,7 +37,7 @@ fun StackApp(startDestination: StartDestination) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
-                if (currentRoute in PrimaryTabRoutes) {
+                if (currentRoute in PrimaryTab.routePaths) {
                     StackBottomBar(
                         currentRoute = currentRoute,
                         onTabSelected = { tab ->
@@ -59,5 +59,3 @@ fun StackApp(startDestination: StartDestination) {
         }
     }
 }
-
-private val PrimaryTabRoutes: Set<String> = PrimaryTab.entries.map { it.route.path }.toSet()

@@ -37,4 +37,18 @@ class RouteTest {
             routes,
         )
     }
+
+    @Test
+    fun primaryTab_routePaths_matches_entries_in_order() {
+        assertEquals(
+            setOf(
+                Route.Lobby.path,
+                Route.Wallet.path,
+                Route.History.path,
+                Route.News.path,
+                Route.Profile.path,
+            ),
+            PrimaryTab.routePaths,
+        )
+    }
 }
