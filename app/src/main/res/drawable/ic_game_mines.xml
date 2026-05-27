@@ -1,0 +1,26 @@
+<!--
+  3x3 grid of cells representing the mines board. Spec
+  (mockup/js/screens/lobby.js, lines 149-152):
+    <rect x="3" y="3" width="5" height="5"/>
+    <rect x="10" y="3" width="5" height="5"/>
+    <rect x="17" y="3" width="4" height="5"/>
+    <rect x="3" y="10" width="5" height="5"/>
+    <rect x="10" y="10" width="5" height="5"/>
+    <rect x="17" y="10" width="4" height="5"/>
+    <rect x="3" y="17" width="5" height="4"/>
+    <rect x="10" y="17" width="5" height="4"/>
+    <rect x="17" y="17" width="4" height="4"/>
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M3,3 h5 v5 h-5 z M10,3 h5 v5 h-5 z M17,3 h4 v5 h-4 z M3,10 h5 v5 h-5 z M10,10 h5 v5 h-5 z M17,10 h4 v5 h-4 z M3,17 h5 v4 h-5 z M10,17 h5 v4 h-5 z M17,17 h4 v4 h-4 z" />
+</vector>
