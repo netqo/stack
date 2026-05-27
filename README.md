@@ -29,7 +29,7 @@ Provably-fair game-outcome engine in C++17 with Android JNI bindings. The engine
 | Stack Casino dark design system (palette + MD3 type scale) | **implemented** (`app/.../ui/theme/`)                                                                  |
 | Compose Navigation graph (17 routes + bottom bar) | **implemented** (`app/.../navigation/`, `app/.../ui/components/StackBottomBar.kt`)                     |
 | Splash Screen API + auth-state gating             | **not implemented yet**                                                                                |
-| Firebase wiring (BoM, Auth, Firestore)            | **not implemented yet**                                                                                |
+| Firebase wiring (BoM, Auth, Firestore, Analytics) | **implemented** (Hilt providers in `app/.../di/AppModule.kt`, no feature consumers yet)                |
 | Google Sign-In via Credential Manager             | **not implemented yet**                                                                                |
 | Per-screen UI (Lobby, Wallet, History, Profile, games, KYC, News, Assistant) | **not implemented yet**                                                                                |
 | NewsAPI consumption + Room caching                | **not implemented yet**                                                                                |
@@ -100,6 +100,18 @@ The test binary prints 10 rounds for each game plus input-validation pass/fail. 
 `ktlintCheck detekt` enforces style and static-analysis gating; the same tasks run as the `lint` job in CI and gate the `android` job. `:app:testDebugUnitTest` runs the JVM unit tests (`StackCasinoAppTest`, `StackcasinoThemeTest`, `RouteTest`).
 
 Prerequisites: Android Studio (or the equivalent SDK + NDK + CMake bundle) and JDK 17.
+
+### Firebase setup
+
+`app/google-services.json` is committed at the repo root so CI can build the debug APK end-to-end. The keys it contains are not secret in the traditional sense: Firebase relies on Security Rules + App Check + the SHA-1 signing fingerprint to gate access, not on client-side secrecy.
+
+If you fork the repo, replace it with one from your own Firebase project:
+
+1. Open https://console.firebase.google.com and create a project (Analytics optional).
+2. Add an Android app with package name `com.plainstudio.stackcasino`.
+3. Pin the debug build's SHA-1 so Google Sign-In can authenticate it: `keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android`. Copy the `SHA1:` line into the Firebase app settings under "Add fingerprint".
+4. Download the generated `google-services.json` and drop it in `app/`.
+5. `./gradlew :app:assembleDebug` should then succeed; the Firebase SDK self-initializes via `FirebaseInitProvider` (no manual `FirebaseApp.initializeApp` call required).
 
 ## Provably fair verification
 

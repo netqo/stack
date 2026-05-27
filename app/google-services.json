@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "374071497483",
+    "project_id": "stack-casino",
+    "storage_bucket": "stack-casino.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:374071497483:android:45f6caefdc121c8bc7880e",
+        "android_client_info": {
+          "package_name": "com.plainstudio.stackcasino"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-gZyy3dmc2oGim-TR7twqpeNmK8lhoFM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
