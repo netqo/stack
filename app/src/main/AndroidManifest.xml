@@ -2,6 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--
+      Required by the Gemini SDK (and any other Retrofit / OkHttp client
+      we end up shipping) so the HTTP layer is allowed to leave the
+      device. Firebase libraries inject this via manifest merger on
+      release builds but a clean debug install needs it declared
+      explicitly, otherwise the assistant repository sees an empty
+      network and collapses to its error bubble on the first turn.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".StackCasinoApp"
         android:allowBackup="true"

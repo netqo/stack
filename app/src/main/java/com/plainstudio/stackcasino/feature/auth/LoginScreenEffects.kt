@@ -1,14 +1,12 @@
 package com.plainstudio.stackcasino.feature.auth
 
 import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -22,10 +20,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.plainstudio.stackcasino.ui.theme.AccentViolet
-import com.plainstudio.stackcasino.ui.theme.SemanticOk
 
 // ---------------------------------------------------------------------------
 // Backgrounds
@@ -145,78 +141,6 @@ internal fun BreathingLogo(content: @Composable () -> Unit) {
 }
 
 // ---------------------------------------------------------------------------
-// Polygon Mainnet pulsing dot
-// ---------------------------------------------------------------------------
-
-/**
- * Ports mockup `.pulse-dot` (styles.css):
- *
- *   @keyframes dot-pulse {
- *     0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.55); transform: scale(1); }
- *     50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0);   transform: scale(1.15); }
- *   }
- *   animation: 1.8s ease-in-out infinite
- *
- * The 6px box-shadow spread is rendered as an expanding green square
- * behind the solid dot; the inner dot scales 1.0 -> 1.15 in step.
- */
-@Composable
-internal fun PulsingDot() {
-    val transition = rememberInfiniteTransition(label = "dot-pulse")
-    val haloSize by transition.animateFloat(
-        initialValue = DOT_SIZE_PX,
-        targetValue = DOT_SIZE_PX + DOT_HALO_SPREAD_PX * 2f,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(durationMillis = DOT_PULSE_MILLIS, easing = LinearOutSlowInEasing),
-                repeatMode = RepeatMode.Restart,
-            ),
-        label = "dot-halo-size",
-    )
-    val haloAlpha by transition.animateFloat(
-        initialValue = DOT_HALO_ALPHA_MAX,
-        targetValue = 0f,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(durationMillis = DOT_PULSE_MILLIS, easing = LinearOutSlowInEasing),
-                repeatMode = RepeatMode.Restart,
-            ),
-        label = "dot-halo-alpha",
-    )
-    val dotScale by transition.animateFloat(
-        initialValue = 1f,
-        targetValue = DOT_SCALE_PEAK,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(durationMillis = DOT_PULSE_MILLIS / 2, easing = EaseInOut),
-                repeatMode = RepeatMode.Reverse,
-            ),
-        label = "dot-scale",
-    )
-
-    Box(
-        modifier = Modifier.size(DotContainerSize),
-        contentAlignment = Alignment.Center,
-    ) {
-        Box(
-            modifier =
-                Modifier
-                    .size(haloSize.dp)
-                    .background(SemanticOk.copy(alpha = haloAlpha)),
-        )
-        Box(
-            modifier =
-                Modifier
-                    .size(DOT_SIZE_PX.dp)
-                    .graphicsLayer {
-                        scaleX = dotScale
-                        scaleY = dotScale
-                    }.background(SemanticOk),
-        )
-    }
-}
-
-// ---------------------------------------------------------------------------
 // Tokens
 // ---------------------------------------------------------------------------
 
@@ -242,11 +166,3 @@ private const val LOGO_GLOW_SCALE_MAX = 1.6f
 private const val LOGO_BREATHE_MILLIS = 3000
 private const val LOGO_HALO_RADIUS_FRACTION = 0.5f
 private val LogoHaloBoxSize = 160.dp
-
-// Pulsing dot.
-private const val DOT_SIZE_PX = 6f
-private const val DOT_HALO_SPREAD_PX = 6f
-private const val DOT_HALO_ALPHA_MAX = 0.55f
-private const val DOT_SCALE_PEAK = 1.15f
-private const val DOT_PULSE_MILLIS = 1800
-private val DotContainerSize = 18.dp
