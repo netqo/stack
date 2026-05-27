@@ -12,6 +12,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.plainstudio.stackcasino.feature.auth.LoginScreen
 
 /**
  * Wires every [Route] into a single Compose nav graph. Each card 09 and
@@ -35,7 +36,16 @@ fun StackNavHost(
         startDestination = startDestination,
         modifier = modifier,
     ) {
-        composable(Route.Login.path) { Placeholder("Login") }
+        composable(Route.Login.path) {
+            LoginScreen(
+                onLoggedIn = {
+                    navController.navigate(Route.Lobby.path) {
+                        popUpTo(Route.Login.path) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
         composable(Route.Lobby.path) { Placeholder("Lobby") }
         composable(Route.Wallet.path) { Placeholder("Wallet") }
         composable(Route.HouseWallet.path) { Placeholder("House Wallet") }

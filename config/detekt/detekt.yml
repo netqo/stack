@@ -46,3 +46,4 @@ style:
     max: 4
   UnusedPrivateMember:
     allowedNames: '_|ignored|expected|serialVersionUID'
+    ignoreAnnotated: ['Preview']
