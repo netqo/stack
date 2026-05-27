@@ -13,6 +13,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.plainstudio.stackcasino.feature.assistant.AssistantScreen
 import com.plainstudio.stackcasino.feature.auth.LoginScreen
 import com.plainstudio.stackcasino.feature.history.HistoryScreen
 import com.plainstudio.stackcasino.feature.history.historyPreviewData
@@ -84,6 +85,9 @@ fun StackNavHost(
                 },
             )
         }
+        composable(Route.Assistant.path) {
+            AssistantScreen(onBack = { navController.popBackStack() })
+        }
         PLACEHOLDER_ROUTES.forEach { (route, label) ->
             placeholderRoute(route, label)
         }
@@ -121,7 +125,6 @@ private val PLACEHOLDER_ROUTES: List<Pair<Route, String>> =
         Route.News to "News",
         Route.Profile to "Profile",
         Route.Kyc to "KYC",
-        Route.Assistant to "Assistant",
         Route.Coinflip to "Coinflip",
         Route.Roulette to "Roulette",
         Route.Crash to "Crash",

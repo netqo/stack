@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.plainstudio.stackcasino.R
+import com.plainstudio.stackcasino.ui.components.PulsingDot
 import com.plainstudio.stackcasino.ui.components.gridBackground
 import com.plainstudio.stackcasino.ui.theme.AccentViolet
 import com.plainstudio.stackcasino.ui.theme.AccentVioletSoft
