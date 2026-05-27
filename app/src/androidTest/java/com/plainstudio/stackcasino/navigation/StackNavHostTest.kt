@@ -1,25 +1,41 @@
 package com.plainstudio.stackcasino.navigation
 
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.plainstudio.stackcasino.HiltTestActivity
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 
 /**
- * Smoke-validates that every [Route] declared in the sealed hierarchy is
- * actually registered in the nav graph and reachable from the start
- * destination. If a route is added to [Route] without a matching
+ * Smoke-validates that every [Route] declared in the sealed hierarchy
+ * is actually registered in the nav graph and reachable from the
+ * start destination. If a route is added to [Route] without a matching
  * `composable(...)` block in [StackNavHost], the call to [navigate]
  * here throws and the test fails.
+ *
+ * Runs against [HiltTestActivity] (not the default `ComponentActivity`
+ * the bare `createComposeRule()` would spin up) because several
+ * destinations call `hiltViewModel()` which only resolves on an
+ * `@AndroidEntryPoint` host.
  */
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class StackNavHostTest {
+    private val hiltRule = HiltAndroidRule(this)
+    private val composeRule = createAndroidComposeRule<HiltTestActivity>()
+
+    // Hilt has to inject the test before the Compose rule mounts the
+    // activity, otherwise hiltViewModel() inside the first composed
+    // screen has no graph to pull from.
     @get:Rule
-    val composeRule = createComposeRule()
+    val ruleChain: RuleChain = RuleChain.outerRule(hiltRule).around(composeRule)
 
     private lateinit var navController: TestNavHostController
 
@@ -27,8 +43,8 @@ class StackNavHostTest {
     fun every_static_route_is_reachable() {
         composeRule.setContent {
             navController =
-                TestNavHostController(ApplicationProvider.getApplicationContext()).apply {
-                    navigatorProvider.addNavigator(androidx.navigation.compose.ComposeNavigator())
+                TestNavHostController(composeRule.activity).apply {
+                    navigatorProvider.addNavigator(ComposeNavigator())
                 }
             StackNavHost(navController = navController, startDestination = Route.Login.path)
         }
@@ -52,7 +68,7 @@ class StackNavHostTest {
             )
 
         staticTargets.forEach { route ->
-            composeRule.runOnUiThread { navController.navigate(route.path) }
+            composeRule.runOnUiThread { navController.navigate(route.defaultPath) }
             composeRule.waitForIdle()
             assertEquals(
                 "Navigation to ${route.path} did not land on the expected destination.",
@@ -66,8 +82,8 @@ class StackNavHostTest {
     fun parametric_routes_resolve_with_arguments() {
         composeRule.setContent {
             navController =
-                TestNavHostController(ApplicationProvider.getApplicationContext()).apply {
-                    navigatorProvider.addNavigator(androidx.navigation.compose.ComposeNavigator())
+                TestNavHostController(composeRule.activity).apply {
+                    navigatorProvider.addNavigator(ComposeNavigator())
                 }
             StackNavHost(navController = navController, startDestination = Route.Login.path)
         }

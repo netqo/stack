@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-only manifest fragment. Registers the bare `HiltTestActivity`
+  in the debug APK so Compose-Hilt instrumented tests can launch it
+  via `createAndroidComposeRule<HiltTestActivity>()`. The release
+  variant skips this sourceset entirely, so production builds do not
+  ship the activity.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name=".HiltTestActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Stackcasino" />
+    </application>
+</manifest>
