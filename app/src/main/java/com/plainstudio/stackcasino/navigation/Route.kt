@@ -15,12 +15,32 @@ package com.plainstudio.stackcasino.navigation
  */
 sealed class Route(
     val path: String,
+    // Used by call sites that just want to "go to this destination"
+    // without supplying an argument. Defaults to [path] so static
+    // routes stay one-liners; parametric routes whose pattern carries
+    // optional query args (e.g. wallet?tab={tab}) override it to the
+    // bare path that produces the default landing state.
+    val defaultPath: String = path,
 ) {
     data object Login : Route("login")
 
     data object Lobby : Route("lobby")
 
-    data object Wallet : Route("wallet")
+    /**
+     * Wallet has three top-level tabs (Deposit / Withdraw / Transactions)
+     * and the lobby's quick actions deep-link to one of the first two.
+     * The optional `tab` query arg surfaces that choice without spinning
+     * up a second route; navigating to `"wallet"` lands on the default
+     * Deposit tab.
+     */
+    data object Wallet : Route(
+        path = "wallet?tab={tab}",
+        defaultPath = "wallet",
+    ) {
+        const val ARG_TAB = "tab"
+
+        fun build(tab: String? = null): String = if (tab.isNullOrBlank()) defaultPath else "wallet?tab=$tab"
+    }
 
     data object HouseWallet : Route("house_wallet")
 

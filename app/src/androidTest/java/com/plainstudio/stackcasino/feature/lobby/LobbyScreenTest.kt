@@ -25,6 +25,7 @@ class LobbyScreenTest {
                 LobbyScreen(
                     state = LobbyUiState.Success(previewLobbyData()),
                     onNavigate = {},
+                    onOpenWallet = {},
                     onRetry = {},
                     onUseCache = {},
                 )
@@ -49,6 +50,7 @@ class LobbyScreenTest {
                 LobbyScreen(
                     state = LobbyUiState.Success(previewLobbyData()),
                     onNavigate = { navigated = it },
+                    onOpenWallet = {},
                     onRetry = {},
                     onUseCache = {},
                 )
@@ -76,6 +78,7 @@ class LobbyScreenTest {
                             lastSyncedLabel = "Last synced 4 minutes ago",
                         ),
                     onNavigate = {},
+                    onOpenWallet = {},
                     onRetry = { retried = true },
                     onUseCache = { usedCache = true },
                 )

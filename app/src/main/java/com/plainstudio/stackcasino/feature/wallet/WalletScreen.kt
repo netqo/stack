@@ -59,8 +59,9 @@ fun WalletScreen(
     data: WalletData,
     onNavigate: (Route) -> Unit,
     modifier: Modifier = Modifier,
+    initialTab: WalletTab = WalletTab.Deposit,
 ) {
-    var selectedTab by rememberSaveable { mutableStateOf(WalletTab.Deposit) }
+    var selectedTab by rememberSaveable { mutableStateOf(initialTab) }
     Surface(modifier = modifier.fillMaxSize(), color = SurfaceBase) {
         Column(
             modifier =
