@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,9 +16,11 @@ import androidx.navigation.navArgument
 import com.plainstudio.stackcasino.feature.auth.LoginScreen
 
 /**
- * Wires every [Route] into a single Compose nav graph. Each card 09 and
- * 10 will replace the placeholder bodies with the real screens; the
- * routing surface itself stays stable.
+ * Wires every [Route] into a single Compose nav graph. Routes that
+ * have not had a real screen implemented yet point at [Placeholder]
+ * (showing the route label centered), so navigation tests can already
+ * walk the whole graph end-to-end while individual screens land in
+ * subsequent feature work.
  *
  * [startDestination] is supplied by the caller (see StackApp), which
  * derives it from SplashViewModel: Login when there is no Firebase
@@ -46,35 +49,69 @@ fun StackNavHost(
                 },
             )
         }
-        composable(Route.Lobby.path) { Placeholder("Lobby") }
-        composable(Route.Wallet.path) { Placeholder("Wallet") }
-        composable(Route.HouseWallet.path) { Placeholder("House Wallet") }
-        composable(Route.History.path) { Placeholder("History") }
-        composable(Route.News.path) { Placeholder("News") }
-        composable(Route.Profile.path) { Placeholder("Profile") }
-        composable(Route.Kyc.path) { Placeholder("KYC") }
-        composable(Route.Assistant.path) { Placeholder("Assistant") }
-        composable(Route.Coinflip.path) { Placeholder("Coinflip") }
-        composable(Route.Roulette.path) { Placeholder("Roulette") }
-        composable(Route.Crash.path) { Placeholder("Crash") }
-        composable(Route.Mines.path) { Placeholder("Mines") }
-        composable(Route.Blackjack.path) { Placeholder("Blackjack") }
+        PLACEHOLDER_ROUTES.forEach { (route, label) ->
+            placeholderRoute(route, label)
+        }
         composable(
             route = Route.RoundDetail.path,
-            arguments = listOf(navArgument(Route.RoundDetail.ARG_ROUND_ID) { type = NavType.StringType }),
+            arguments =
+                listOf(
+                    navArgument(Route.RoundDetail.ARG_ROUND_ID) { type = NavType.StringType },
+                ),
         ) { entry ->
-            val id = entry.arguments?.getString(Route.RoundDetail.ARG_ROUND_ID).orEmpty()
+            val id = entry.requireStringArg(Route.RoundDetail.ARG_ROUND_ID)
             Placeholder("Round Detail · $id")
         }
         composable(
             route = Route.NewsDetail.path,
-            arguments = listOf(navArgument(Route.NewsDetail.ARG_ARTICLE_ID) { type = NavType.StringType }),
+            arguments =
+                listOf(
+                    navArgument(Route.NewsDetail.ARG_ARTICLE_ID) { type = NavType.StringType },
+                ),
         ) { entry ->
-            val id = entry.arguments?.getString(Route.NewsDetail.ARG_ARTICLE_ID).orEmpty()
+            val id = entry.requireStringArg(Route.NewsDetail.ARG_ARTICLE_ID)
             Placeholder("News Detail · $id")
         }
     }
 }
+
+/**
+ * Routes that have not had a real screen implemented yet. Each entry
+ * resolves to [Placeholder] in the nav graph; replacing the placeholder
+ * is a one-line edit when the feature lands.
+ */
+private val PLACEHOLDER_ROUTES: List<Pair<Route, String>> =
+    listOf(
+        Route.Lobby to "Lobby",
+        Route.Wallet to "Wallet",
+        Route.HouseWallet to "House Wallet",
+        Route.History to "History",
+        Route.News to "News",
+        Route.Profile to "Profile",
+        Route.Kyc to "KYC",
+        Route.Assistant to "Assistant",
+        Route.Coinflip to "Coinflip",
+        Route.Roulette to "Roulette",
+        Route.Crash to "Crash",
+        Route.Mines to "Mines",
+        Route.Blackjack to "Blackjack",
+    )
+
+private fun NavGraphBuilder.placeholderRoute(
+    route: Route,
+    label: String,
+) {
+    composable(route.path) { Placeholder(label) }
+}
+
+/**
+ * Read a mandatory navigation argument. Missing arguments indicate a
+ * malformed navigate() call somewhere upstream; surface that loudly
+ * instead of silently falling back to an empty string.
+ */
+private fun androidx.navigation.NavBackStackEntry.requireStringArg(name: String): String =
+    arguments?.getString(name)
+        ?: error("Navigation argument '$name' is missing on ${destination.route}")
 
 @Composable
 private fun Placeholder(label: String) {

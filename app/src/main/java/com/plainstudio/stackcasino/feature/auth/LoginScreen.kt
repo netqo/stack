@@ -1,14 +1,6 @@
 package com.plainstudio.stackcasino.feature.auth
 
 import android.app.Activity
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -41,13 +33,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -80,9 +67,11 @@ import com.plainstudio.stackcasino.ui.theme.TextMedium
  * an OVERLAY (Box.align(TopCenter)) so it sits over the meta row
  * instead of being part of the flow, which would push the hero down.
  *
- * Backdrop sources:
- *   * radial violet glow from the mockup style block
- *   * 24dp dotted grid (rgba(255,255,255,0.035) * opacity 0.4)
+ * Backdrop sources live in LoginScreenEffects.kt:
+ *   * Modifier.backgroundGlow - radial violet glow
+ *   * Modifier.gridBackground - 24dp dotted grid
+ *   * BreathingLogo / PulsingDot - infinite-transition animations
+ *   * Modifier.glowShadow - sign-in button violet glow
  */
 @Composable
 fun LoginScreen(
@@ -126,18 +115,15 @@ private fun LoginScreenContent(
                     .backgroundGlow()
                     .gridBackground(),
         ) {
-            // Main column. Same layout across every state; the error
-            // banner is rendered as an overlay below so the hero does
-            // not shift.
             Column(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 20.dp)
-                        .padding(top = 24.dp, bottom = 24.dp),
+                        .padding(horizontal = ScreenHorizontalPadding)
+                        .padding(top = ScreenVerticalPadding, bottom = ScreenVerticalPadding),
             ) {
                 TopMetaRow()
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(MetaRowToHeroGap))
                 Hero(modifier = Modifier.weight(1f))
                 BottomActionBlock(
                     state = state,
@@ -154,13 +140,17 @@ private fun LoginScreenContent(
                         Modifier
                             .align(Alignment.TopCenter)
                             .fillMaxWidth()
-                            .padding(horizontal = 12.dp)
-                            .padding(top = 12.dp),
+                            .padding(horizontal = ErrorBannerHorizontalPadding)
+                            .padding(top = ErrorBannerTopPadding),
                 )
             }
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Top meta row + hero
+// ---------------------------------------------------------------------------
 
 @Composable
 private fun TopMetaRow() {
@@ -173,7 +163,7 @@ private fun TopMetaRow() {
             text = "PLAIN STUDIO",
             color = TextLow,
             fontSize = 10.sp,
-            letterSpacing = 1.5.sp,
+            letterSpacing = LetterSpacingMeta,
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -184,7 +174,7 @@ private fun TopMetaRow() {
                 text = "POLYGON MAINNET",
                 color = SemanticOk,
                 fontSize = 10.sp,
-                letterSpacing = 1.5.sp,
+                letterSpacing = LetterSpacingMeta,
             )
         }
     }
@@ -197,21 +187,21 @@ private fun Hero(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        BreathingLogo()
+        BreathingLogo { StackLogoGlyph() }
         Spacer(modifier = Modifier.height(28.dp))
         Text(
             text = "STACK",
             color = TextHigh,
             fontSize = 40.sp,
             fontWeight = FontWeight.Bold,
-            letterSpacing = 7.sp,
+            letterSpacing = LetterSpacingHero,
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = "CASINO",
             color = AccentVioletSoft,
             fontSize = 10.sp,
-            letterSpacing = 3.sp,
+            letterSpacing = LetterSpacingSubtitle,
         )
         Spacer(modifier = Modifier.height(20.dp))
         Text(
@@ -220,7 +210,7 @@ private fun Hero(modifier: Modifier = Modifier) {
             fontSize = 13.sp,
             textAlign = TextAlign.Center,
             lineHeight = 20.sp,
-            modifier = Modifier.widthIn(max = 280.dp),
+            modifier = Modifier.widthIn(max = HeroTaglineMaxWidth),
         )
         Spacer(modifier = Modifier.height(28.dp))
         TrustBadgesRow()
@@ -230,172 +220,36 @@ private fun Hero(modifier: Modifier = Modifier) {
 @Composable
 private fun StackLogoGlyph() {
     Box(
-        modifier = Modifier.size(80.dp),
+        modifier = Modifier.size(StackLogoSize),
         contentAlignment = Alignment.Center,
     ) {
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .border(width = 4.dp, color = AccentViolet),
+                    .border(width = StackLogoOuterBorder, color = AccentViolet),
         )
         Box(
             modifier =
                 Modifier
-                    .padding(8.dp)
+                    .padding(StackLogoMiddleInset)
                     .fillMaxSize()
-                    .border(width = 2.dp, color = AccentVioletSoft),
+                    .border(width = StackLogoMiddleBorder, color = AccentVioletSoft),
         )
         Box(
             modifier =
                 Modifier
-                    .padding(20.dp)
+                    .padding(StackLogoCoreInset)
                     .fillMaxSize()
                     .background(AccentViolet),
         )
     }
 }
 
-/**
- * Ports mockup `.logo-breathe` (styles.css):
- *   @keyframes logo-breathe {
- *     0%, 100% { opacity: 0.25; transform: scale(1.4); }
- *     50%      { opacity: 0.45; transform: scale(1.6); }
- *   }
- *   animation: 3s ease-in-out infinite
- *
- * Rendered as a radial-gradient violet halo behind [StackLogoGlyph].
- */
-@Composable
-private fun BreathingLogo() {
-    val transition = rememberInfiniteTransition(label = "logo-breathe")
-    val glowAlpha by transition.animateFloat(
-        initialValue = LOGO_GLOW_ALPHA_MIN,
-        targetValue = LOGO_GLOW_ALPHA_MAX,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(durationMillis = LOGO_BREATHE_MS, easing = EaseInOut),
-                repeatMode = RepeatMode.Reverse,
-            ),
-        label = "logo-breathe-alpha",
-    )
-    val glowScale by transition.animateFloat(
-        initialValue = LOGO_GLOW_SCALE_MIN,
-        targetValue = LOGO_GLOW_SCALE_MAX,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(durationMillis = LOGO_BREATHE_MS, easing = EaseInOut),
-                repeatMode = RepeatMode.Reverse,
-            ),
-        label = "logo-breathe-scale",
-    )
-
-    Box(
-        modifier = Modifier.size(LOGO_HALO_BOX),
-        contentAlignment = Alignment.Center,
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val brush =
-                Brush.radialGradient(
-                    colors =
-                        listOf(
-                            AccentViolet.copy(alpha = glowAlpha),
-                            Color.Transparent,
-                        ),
-                    center = Offset(size.width / 2f, size.height / 2f),
-                    radius = size.minDimension * 0.5f * glowScale,
-                )
-            drawRect(brush = brush)
-        }
-        StackLogoGlyph()
-    }
-}
-
-/**
- * Ports mockup `.pulse-dot` (styles.css):
- *   @keyframes dot-pulse {
- *     0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.55); transform: scale(1); }
- *     50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0);   transform: scale(1.15); }
- *   }
- *   animation: 1.8s ease-in-out infinite
- *
- * The 6px box-shadow spread is rendered as an expanding green square
- * behind the solid dot; the inner dot scales 1.0 -> 1.15 in step.
- */
-@Composable
-private fun PulsingDot() {
-    val transition = rememberInfiniteTransition(label = "dot-pulse")
-    val haloSize by transition.animateFloat(
-        initialValue = DOT_SIZE_PX,
-        targetValue = DOT_SIZE_PX + DOT_HALO_SPREAD_PX * 2f,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(durationMillis = DOT_PULSE_MS, easing = LinearOutSlowInEasing),
-                repeatMode = RepeatMode.Restart,
-            ),
-        label = "dot-halo-size",
-    )
-    val haloAlpha by transition.animateFloat(
-        initialValue = DOT_HALO_ALPHA_MAX,
-        targetValue = 0f,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(durationMillis = DOT_PULSE_MS, easing = LinearOutSlowInEasing),
-                repeatMode = RepeatMode.Restart,
-            ),
-        label = "dot-halo-alpha",
-    )
-    val dotScale by transition.animateFloat(
-        initialValue = 1f,
-        targetValue = DOT_SCALE_PEAK,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(durationMillis = DOT_PULSE_MS / 2, easing = EaseInOut),
-                repeatMode = RepeatMode.Reverse,
-            ),
-        label = "dot-scale",
-    )
-
-    Box(
-        modifier = Modifier.size(DOT_CONTAINER),
-        contentAlignment = Alignment.Center,
-    ) {
-        Box(
-            modifier =
-                Modifier
-                    .size(haloSize.dp)
-                    .background(SemanticOk.copy(alpha = haloAlpha)),
-        )
-        Box(
-            modifier =
-                Modifier
-                    .size(DOT_SIZE_PX.dp)
-                    .graphicsLayer {
-                        scaleX = dotScale
-                        scaleY = dotScale
-                    }.background(SemanticOk),
-        )
-    }
-}
-
-private const val DOT_SIZE_PX = 6f
-private const val DOT_HALO_SPREAD_PX = 6f
-private const val DOT_HALO_ALPHA_MAX = 0.55f
-private const val DOT_SCALE_PEAK = 1.15f
-private const val DOT_PULSE_MS = 1800
-private val DOT_CONTAINER = 18.dp
-
-private const val LOGO_GLOW_ALPHA_MIN = 0.25f
-private const val LOGO_GLOW_ALPHA_MAX = 0.45f
-private const val LOGO_GLOW_SCALE_MIN = 1.4f
-private const val LOGO_GLOW_SCALE_MAX = 1.6f
-private const val LOGO_BREATHE_MS = 3000
-private val LOGO_HALO_BOX = 160.dp
-
 @Composable
 private fun TrustBadgesRow() {
     Row(
-        modifier = Modifier.fillMaxWidth().widthIn(max = 320.dp),
+        modifier = Modifier.widthIn(max = TrustBadgesMaxWidth),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         TrustBadge(
@@ -425,7 +279,7 @@ private fun TrustBadge(
     Column(
         modifier =
             modifier
-                .background(SurfaceElevated.copy(alpha = 0.6f))
+                .background(SurfaceElevated.copy(alpha = BADGE_BACKGROUND_ALPHA))
                 .border(width = 1.dp, color = SurfaceOutline)
                 .padding(vertical = 12.dp, horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -435,17 +289,21 @@ private fun TrustBadge(
             imageVector = icon,
             contentDescription = null,
             tint = AccentViolet,
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(TrustBadgeIconSize),
         )
         Text(
             text = label,
             color = TextMedium,
             fontSize = 8.sp,
-            letterSpacing = 1.sp,
+            letterSpacing = LetterSpacingTight,
             textAlign = TextAlign.Center,
         )
     }
 }
+
+// ---------------------------------------------------------------------------
+// Bottom action block (sign-in / loading / continue as)
+// ---------------------------------------------------------------------------
 
 @Composable
 private fun BottomActionBlock(
@@ -469,147 +327,13 @@ private fun BottomActionBlock(
 }
 
 @Composable
-private fun ErrorBanner(
-    message: String,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    // Banner styling approximates the mockup's `backdrop-blur` look:
-    // an opaque-ish dark surface tinted red plus a strong red border.
-    // True backdrop blur in Compose needs RenderEffect (API 31+) and
-    // is not worth the conditional wiring at this stage.
-    Surface(
-        modifier =
-            modifier
-                .border(width = 1.dp, color = SemanticDanger),
-        color = SurfaceBase.copy(alpha = 0.92f),
-    ) {
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .background(SemanticDanger.copy(alpha = 0.10f))
-                    .padding(start = 14.dp, end = 8.dp, top = 12.dp, bottom = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "SIGN-IN FAILED",
-                    color = SemanticDanger,
-                    fontSize = 10.sp,
-                    letterSpacing = 1.2.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = message,
-                    color = TextHigh,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                )
-            }
-            Box(
-                modifier =
-                    Modifier
-                        .size(36.dp)
-                        .clickable(onClick = onDismiss),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = "Dismiss",
-                    tint = SemanticDanger,
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ContinueAsCard(
-    state: LoginUiState.Returning,
-    onClick: () -> Unit,
-) {
-    Surface(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .border(width = 1.dp, color = AccentViolet.copy(alpha = 0.5f))
-                .clickable(onClick = onClick),
-        color = AccentViolet.copy(alpha = 0.10f),
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Box(
-                modifier = Modifier.size(44.dp).background(AccentViolet),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = initialsOf(state.displayName),
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "CONTINUE AS",
-                    color = AccentVioletSoft,
-                    fontSize = 9.sp,
-                    letterSpacing = 1.2.sp,
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = state.displayName,
-                    color = TextHigh,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    text = state.email,
-                    color = TextMedium,
-                    fontSize = 11.sp,
-                )
-            }
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = AccentViolet,
-                modifier = Modifier.size(18.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun UseAnotherAccountLink(onClick: () -> Unit) {
-    Text(
-        text = "USE ANOTHER ACCOUNT",
-        color = TextMedium,
-        fontSize = 10.sp,
-        letterSpacing = 1.2.sp,
-        textAlign = TextAlign.Center,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(vertical = 8.dp),
-    )
-}
-
-@Composable
 private fun SignInButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier =
             Modifier
                 .fillMaxWidth()
-                .height(BUTTON_HEIGHT)
+                .height(ButtonHeight)
                 .glowShadow(),
         shape = RectangleShape,
         colors =
@@ -627,7 +351,7 @@ private fun SignInButton(onClick: () -> Unit) {
                 painter = painterResource(R.drawable.ic_google_g),
                 contentDescription = null,
                 tint = Color.Unspecified,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(GoogleGlyphSize),
             )
             Text(
                 text = "Sign in with Google",
@@ -646,14 +370,14 @@ private fun LoadingButton() {
         modifier =
             Modifier
                 .fillMaxWidth()
-                .height(BUTTON_HEIGHT)
+                .height(ButtonHeight)
                 .glowShadow(),
         shape = RectangleShape,
         colors =
             ButtonDefaults.buttonColors(
-                containerColor = AccentViolet.copy(alpha = 0.6f),
+                containerColor = AccentViolet.copy(alpha = LOADING_BUTTON_ALPHA),
                 contentColor = Color.White,
-                disabledContainerColor = AccentViolet.copy(alpha = 0.6f),
+                disabledContainerColor = AccentViolet.copy(alpha = LOADING_BUTTON_ALPHA),
                 disabledContentColor = Color.White,
             ),
         contentPadding = PaddingValues(horizontal = 16.dp),
@@ -663,9 +387,9 @@ private fun LoadingButton() {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             CircularProgressIndicator(
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(LoadingSpinnerSize),
                 color = Color.White,
-                strokeWidth = 2.dp,
+                strokeWidth = LoadingSpinnerStroke,
             )
             Text(
                 text = "Connecting to Google...",
@@ -676,26 +400,80 @@ private fun LoadingButton() {
     }
 }
 
-private val BUTTON_HEIGHT = 52.dp
+@Composable
+private fun ContinueAsCard(
+    state: LoginUiState.Returning,
+    onClick: () -> Unit,
+) {
+    Surface(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .border(width = 1.dp, color = AccentViolet.copy(alpha = RETURNING_CARD_BORDER_ALPHA))
+                .clickable(onClick = onClick),
+        color = AccentViolet.copy(alpha = RETURNING_CARD_BACKGROUND_ALPHA),
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Box(
+                modifier = Modifier.background(AccentViolet).size(ContinueAsAvatarSize),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = initialsOf(state.displayName),
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "CONTINUE AS",
+                    color = AccentVioletSoft,
+                    fontSize = 9.sp,
+                    letterSpacing = LetterSpacingTracked,
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = state.displayName,
+                    color = TextHigh,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = state.email,
+                    color = TextMedium,
+                    fontSize = 11.sp,
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                tint = AccentViolet,
+                modifier = Modifier.size(ContinueAsChevronSize),
+            )
+        }
+    }
+}
 
-// Mockup design token (mockup/js/config.js):
-//   boxShadow.glow = '0 0 24px rgba(139,92,246,0.35)'
-// Compose has no direct box-shadow primitive, so we emulate it with
-// the ambient/spot colored shadow API. Elevation is tuned so the
-// blur spread on a 52dp tall button reads close to the 24px radius
-// of the source. clip=false lets the glow leak outside the button
-// bounds, which is what the mockup expects.
-private val ButtonGlowColor = Color(0xFF8B5CF6).copy(alpha = 0.35f)
-private val ButtonGlowElevation = 12.dp
-
-private fun Modifier.glowShadow(): Modifier =
-    shadow(
-        elevation = ButtonGlowElevation,
-        shape = RectangleShape,
-        ambientColor = ButtonGlowColor,
-        spotColor = ButtonGlowColor,
-        clip = false,
+@Composable
+private fun UseAnotherAccountLink(onClick: () -> Unit) {
+    Text(
+        text = "USE ANOTHER ACCOUNT",
+        color = TextMedium,
+        fontSize = 10.sp,
+        letterSpacing = LetterSpacingTracked,
+        textAlign = TextAlign.Center,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(vertical = 8.dp),
     )
+}
 
 @Composable
 private fun LegalFootnote() {
@@ -706,11 +484,73 @@ private fun LegalFootnote() {
         color = TextLow,
         fontSize = 9.sp,
         lineHeight = 14.sp,
-        letterSpacing = 0.5.sp,
+        letterSpacing = LetterSpacingLegal,
         textAlign = TextAlign.Center,
         modifier = Modifier.fillMaxWidth(),
     )
 }
+
+// ---------------------------------------------------------------------------
+// Error banner (overlay so the hero never shifts)
+// ---------------------------------------------------------------------------
+
+@Composable
+private fun ErrorBanner(
+    message: String,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    // Banner styling approximates the mockup's `backdrop-blur` look:
+    // an opaque-ish dark surface tinted red plus a strong red border.
+    // True backdrop blur in Compose needs RenderEffect (API 31+) and
+    // is not worth the conditional wiring at this stage.
+    Surface(
+        modifier = modifier.border(width = 1.dp, color = SemanticDanger),
+        color = SurfaceBase.copy(alpha = ERROR_BANNER_SURFACE_ALPHA),
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(SemanticDanger.copy(alpha = ERROR_BANNER_TINT_ALPHA))
+                    .padding(start = 14.dp, end = 8.dp, top = 12.dp, bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "SIGN-IN FAILED",
+                    color = SemanticDanger,
+                    fontSize = 10.sp,
+                    letterSpacing = LetterSpacingTracked,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = message,
+                    color = TextHigh,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                )
+            }
+            Box(
+                modifier = Modifier.size(ErrorDismissHitArea).clickable(onClick = onDismiss),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "Dismiss",
+                    tint = SemanticDanger,
+                    modifier = Modifier.size(ErrorDismissIconSize),
+                )
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 /**
  * Splits the display name on whitespace and joins the first letter of
@@ -726,74 +566,6 @@ private fun initialsOf(name: String): String {
     }
 }
 
-// Radial glow tuning. Matches mockup/js/screens/login.js where the
-// background style is composed from two radial gradients seeded at the
-// hero (top) and bottom-left corners.
-private const val TOP_GLOW_ALPHA = 0.22f
-private const val TOP_GLOW_CENTER_Y_FRACTION = 0.32f
-private const val TOP_GLOW_RADIUS_FRACTION = 0.65f
-private const val BOTTOM_GLOW_ALPHA = 0.08f
-private const val BOTTOM_GLOW_CENTER_X_FRACTION = 0.2f
-private const val BOTTOM_GLOW_CENTER_Y_FRACTION = 0.9f
-private const val BOTTOM_GLOW_RADIUS_FRACTION = 0.55f
-
-// Grid background. Mockup styles.css uses
-//   linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px)
-//   * the parent has opacity-40, so the effective alpha is ~0.014
-// We round up slightly so the grid stays perceptible after the violet
-// glow saturates the surface.
-private val GridLineColor = Color.White.copy(alpha = 0.035f)
-private val GridCellSize = 24.dp
-private val GridLineWidth = 1.dp
-
-private fun Modifier.backgroundGlow(): Modifier =
-    drawBehind {
-        val topGlow =
-            Brush.radialGradient(
-                colors = listOf(AccentViolet.copy(alpha = TOP_GLOW_ALPHA), Color.Transparent),
-                center = Offset(size.width / 2f, size.height * TOP_GLOW_CENTER_Y_FRACTION),
-                radius = size.minDimension * TOP_GLOW_RADIUS_FRACTION,
-            )
-        val bottomGlow =
-            Brush.radialGradient(
-                colors = listOf(AccentViolet.copy(alpha = BOTTOM_GLOW_ALPHA), Color.Transparent),
-                center =
-                    Offset(
-                        size.width * BOTTOM_GLOW_CENTER_X_FRACTION,
-                        size.height * BOTTOM_GLOW_CENTER_Y_FRACTION,
-                    ),
-                radius = size.minDimension * BOTTOM_GLOW_RADIUS_FRACTION,
-            )
-        drawRect(brush = topGlow)
-        drawRect(brush = bottomGlow)
-    }
-
-private fun Modifier.gridBackground(): Modifier =
-    drawBehind {
-        val cellPx = GridCellSize.toPx()
-        val strokePx = GridLineWidth.toPx()
-        var x = 0f
-        while (x <= size.width) {
-            drawLine(
-                color = GridLineColor,
-                start = Offset(x, 0f),
-                end = Offset(x, size.height),
-                strokeWidth = strokePx,
-            )
-            x += cellPx
-        }
-        var y = 0f
-        while (y <= size.height) {
-            drawLine(
-                color = GridLineColor,
-                start = Offset(0f, y),
-                end = Offset(size.width, y),
-                strokeWidth = strokePx,
-            )
-            y += cellPx
-        }
-    }
-
 /**
  * Walks the ContextWrapper chain until it lands on an Activity.
  * Required because Credential Manager's getCredential expects an
@@ -805,6 +577,61 @@ private tailrec fun android.content.Context.findActivity(): Activity? =
         is android.content.ContextWrapper -> baseContext.findActivity()
         else -> null
     }
+
+// ---------------------------------------------------------------------------
+// Tokens
+// ---------------------------------------------------------------------------
+
+// Screen frame.
+private val ScreenHorizontalPadding = 20.dp
+private val ScreenVerticalPadding = 24.dp
+private val MetaRowToHeroGap = 8.dp
+private val ErrorBannerHorizontalPadding = 12.dp
+private val ErrorBannerTopPadding = 12.dp
+
+// Hero / brand logo.
+private val StackLogoSize = 80.dp
+private val StackLogoOuterBorder = 4.dp
+private val StackLogoMiddleInset = 8.dp
+private val StackLogoMiddleBorder = 2.dp
+private val StackLogoCoreInset = 20.dp
+private val HeroTaglineMaxWidth = 280.dp
+private val TrustBadgesMaxWidth = 320.dp
+private val TrustBadgeIconSize = 16.dp
+
+// Bottom action block.
+private val ButtonHeight = 52.dp
+private val GoogleGlyphSize = 20.dp
+private val LoadingSpinnerSize = 18.dp
+private val LoadingSpinnerStroke = 2.dp
+private val ContinueAsAvatarSize = 44.dp
+private val ContinueAsChevronSize = 18.dp
+
+// Error banner.
+private val ErrorDismissHitArea = 36.dp
+private val ErrorDismissIconSize = 20.dp
+
+// Semantic surface alphas. Tied to the mockup compositing recipe; the
+// names describe the role on the screen, not the numeric value, so a
+// future polish pass can re-tune them without scanning the file.
+private const val BADGE_BACKGROUND_ALPHA = 0.6f
+private const val LOADING_BUTTON_ALPHA = 0.6f
+private const val ERROR_BANNER_SURFACE_ALPHA = 0.92f
+private const val ERROR_BANNER_TINT_ALPHA = 0.10f
+private const val RETURNING_CARD_BACKGROUND_ALPHA = 0.10f
+private const val RETURNING_CARD_BORDER_ALPHA = 0.5f
+
+// Tracked letter-spacings (uppercase tracked text in the mockup).
+private val LetterSpacingMeta = 1.5.sp
+private val LetterSpacingTracked = 1.2.sp
+private val LetterSpacingTight = 1.sp
+private val LetterSpacingSubtitle = 3.sp
+private val LetterSpacingHero = 7.sp
+private val LetterSpacingLegal = 0.5.sp
+
+// ---------------------------------------------------------------------------
+// Previews
+// ---------------------------------------------------------------------------
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0B12)
 @Composable

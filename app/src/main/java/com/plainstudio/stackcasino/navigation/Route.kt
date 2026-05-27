@@ -59,9 +59,9 @@ sealed class Route(
 
 /**
  * Bottom-navigation tabs. The bar is rendered only when the current
- * destination matches one of these; deep screens (Splash, Login,
- * RoundDetail, NewsDetail, KYC, HouseWallet, Assistant and the five
- * games) take the full viewport.
+ * destination matches one of these; deep screens (Login, RoundDetail,
+ * NewsDetail, KYC, HouseWallet, Assistant and the five games) take
+ * the full viewport.
  */
 enum class PrimaryTab(
     val route: Route,
@@ -72,4 +72,14 @@ enum class PrimaryTab(
     History(Route.History, "History"),
     News(Route.News, "News"),
     Profile(Route.Profile, "Profile"),
+    ;
+
+    companion object {
+        /**
+         * Pre-computed set of route paths owned by a tab, used by the
+         * top-level Scaffold to decide whether the bottom bar should
+         * be visible for the current destination.
+         */
+        val routePaths: Set<String> = entries.map { it.route.path }.toSet()
+    }
 }
