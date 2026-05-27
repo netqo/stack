@@ -9,4 +9,15 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
+
+    <!-- Splash Screen theme applied to MainActivity at boot.
+         Inherits from Theme.SplashScreen so the AndroidX core-splashscreen
+         backport stays consistent with the API 31+ platform behavior:
+         brand-colored background, centered icon, then a fade-out into
+         postSplashScreenTheme once the activity is ready. -->
+    <style name="Theme.Stackcasino.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/stackcasino_window_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.Stackcasino</item>
+    </style>
 </resources>

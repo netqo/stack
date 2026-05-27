@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.plainstudio.stackcasino.navigation.PrimaryTab
 import com.plainstudio.stackcasino.navigation.Route
 import com.plainstudio.stackcasino.navigation.StackNavHost
+import com.plainstudio.stackcasino.navigation.StartDestination
 import com.plainstudio.stackcasino.ui.components.StackBottomBar
 import com.plainstudio.stackcasino.ui.theme.StackcasinoTheme
 
@@ -19,11 +20,15 @@ import com.plainstudio.stackcasino.ui.theme.StackcasinoTheme
  * navigation bar plus the [StackNavHost] for the current destination.
  *
  * The bar is only shown when the active route is one of [PrimaryTab];
- * splash, login, deep details, KYC, house wallet, the assistant and the
- * five games own the full viewport.
+ * login, deep details, KYC, house wallet, the assistant and the five
+ * games own the full viewport.
+ *
+ * [startDestination] is decided by SplashViewModel from the cached
+ * Firebase Auth state; MainActivity holds the system splash until the
+ * decision is made and only then mounts this composable.
  */
 @Composable
-fun StackApp() {
+fun StackApp(startDestination: StartDestination) {
     StackcasinoTheme {
         val navController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
@@ -48,6 +53,7 @@ fun StackApp() {
         ) { padding ->
             StackNavHost(
                 navController = navController,
+                startDestination = startDestination.route,
                 modifier = Modifier.padding(padding),
             )
         }
