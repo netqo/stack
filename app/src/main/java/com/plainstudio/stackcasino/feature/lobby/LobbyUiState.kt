@@ -1,5 +1,8 @@
 package com.plainstudio.stackcasino.feature.lobby
 
+import com.plainstudio.stackcasino.model.GameKey
+import com.plainstudio.stackcasino.model.RoundOutcome
+
 /**
  * UI state for the lobby screen.
  *
@@ -83,14 +86,6 @@ data class GameCardData(
     val isLastPlayed: Boolean = false,
 )
 
-enum class GameKey {
-    Roulette,
-    Blackjack,
-    Crash,
-    Mines,
-    Coinflip,
-}
-
 /**
  * Recent activity row.
  *
@@ -106,5 +101,3 @@ data class RecentRound(
     val amountLabel: String,
     val outcome: RoundOutcome,
 )
-
-enum class RoundOutcome { Win, Loss }

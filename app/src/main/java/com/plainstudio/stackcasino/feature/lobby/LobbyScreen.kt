@@ -42,6 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plainstudio.stackcasino.R
+import com.plainstudio.stackcasino.model.GameKey
+import com.plainstudio.stackcasino.model.RoundOutcome
 import com.plainstudio.stackcasino.navigation.Route
 import com.plainstudio.stackcasino.ui.components.BalancePill
 import com.plainstudio.stackcasino.ui.components.CurrencyDropdown

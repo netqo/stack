@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -36,10 +38,17 @@ import com.plainstudio.stackcasino.ui.theme.TextMedium
  *   gap:      8dp between chips
  *
  * Generic over the chip key type so callers stay type-safe (an enum,
- * sealed type, or domain id works equally well). [scrollable] flips
- * the layout from a wrapped Row to a horizontal-scroll lane (news
- * source filters use this; wallet tabs do not).
+ * sealed type, or domain id works equally well).
+ *
+ * Layout flags (mutually exclusive; precedence order is the same as the
+ * parameter list):
+ *   * [scrollable] -> horizontal-scroll lane (news source filters).
+ *   * [wrap]       -> FlowRow that wraps onto multiple lines when the
+ *                     chip set overflows (history game filter).
+ *   * default      -> single Row (wallet transaction tabs, history
+ *                     result filter, and any tight chip set).
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun <T> FilterChipRow(
     chips: List<FilterChip<T>>,
@@ -47,24 +56,41 @@ fun <T> FilterChipRow(
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
     scrollable: Boolean = false,
+    wrap: Boolean = false,
 ) {
-    val container =
-        if (scrollable) {
-            modifier.horizontalScroll(rememberScrollState())
-        } else {
-            modifier
+    when {
+        scrollable -> {
+            Row(
+                modifier = modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(ChipGap),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                chips.forEach { chip ->
+                    Chip(label = chip.label, isActive = chip.key == selected, onClick = { onSelect(chip.key) })
+                }
+            }
         }
-    Row(
-        modifier = container,
-        horizontalArrangement = Arrangement.spacedBy(ChipGap),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        chips.forEach { chip ->
-            Chip(
-                label = chip.label,
-                isActive = chip.key == selected,
-                onClick = { onSelect(chip.key) },
-            )
+        wrap -> {
+            FlowRow(
+                modifier = modifier,
+                horizontalArrangement = Arrangement.spacedBy(ChipGap),
+                verticalArrangement = Arrangement.spacedBy(ChipGap),
+            ) {
+                chips.forEach { chip ->
+                    Chip(label = chip.label, isActive = chip.key == selected, onClick = { onSelect(chip.key) })
+                }
+            }
+        }
+        else -> {
+            Row(
+                modifier = modifier,
+                horizontalArrangement = Arrangement.spacedBy(ChipGap),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                chips.forEach { chip ->
+                    Chip(label = chip.label, isActive = chip.key == selected, onClick = { onSelect(chip.key) })
+                }
+            }
         }
     }
 }

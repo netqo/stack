@@ -14,6 +14,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.plainstudio.stackcasino.feature.auth.LoginScreen
+import com.plainstudio.stackcasino.feature.history.HistoryScreen
+import com.plainstudio.stackcasino.feature.history.historyPreviewData
 import com.plainstudio.stackcasino.feature.lobby.LobbyScreen
 import com.plainstudio.stackcasino.feature.lobby.LobbyUiState
 import com.plainstudio.stackcasino.feature.lobby.previewLobbyData
@@ -72,6 +74,16 @@ fun StackNavHost(
                 },
             )
         }
+        composable(Route.History.path) {
+            HistoryScreen(
+                data = historyPreviewData(),
+                onOpenRound = { roundId ->
+                    navController.navigate(Route.RoundDetail.build(roundId)) {
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
         PLACEHOLDER_ROUTES.forEach { (route, label) ->
             placeholderRoute(route, label)
         }
@@ -106,7 +118,6 @@ fun StackNavHost(
 private val PLACEHOLDER_ROUTES: List<Pair<Route, String>> =
     listOf(
         Route.HouseWallet to "House Wallet",
-        Route.History to "History",
         Route.News to "News",
         Route.Profile to "Profile",
         Route.Kyc to "KYC",

@@ -1,5 +1,8 @@
 package com.plainstudio.stackcasino.feature.lobby
 
+import com.plainstudio.stackcasino.model.GameKey
+import com.plainstudio.stackcasino.model.RoundOutcome
+
 /**
  * Static seed used by both the lobby @Preview composables and the live
  * navigation entry until the Firestore-backed ViewModel ships.
