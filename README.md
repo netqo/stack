@@ -29,8 +29,8 @@ Provably-fair game-outcome engine in C++17 with Android JNI bindings. The engine
 | Stack Casino dark design system (palette + MD3 type scale) | **implemented** (`app/.../ui/theme/`)                                                                  |
 | Compose Navigation graph (16 routes + bottom bar) | **implemented** (`app/.../navigation/`, `app/.../ui/components/StackBottomBar.kt`)                     |
 | Splash Screen API + auth-state gating             | **implemented** (`Theme.Stackcasino.Splash` + `SplashViewModel` resolves Firebase session into Login/Lobby start destination) |
-| Firebase wiring (BoM, Auth, Firestore, Analytics) | **implemented** (Hilt providers in `app/.../di/AppModule.kt`, no feature consumers yet)                |
-| Google Sign-In via Credential Manager             | **not implemented yet**                                                                                |
+| Firebase wiring (BoM, Auth, Firestore, Analytics) | **implemented** (Hilt providers in `app/.../di/AppModule.kt`)                                          |
+| Google Sign-In via Credential Manager             | **implemented** (`AuthRepository` + `LoginScreen` exchange a Google ID token with Firebase Auth)       |
 | Per-screen UI (Lobby, Wallet, History, Profile, games, KYC, News, Assistant) | **not implemented yet**                                                                                |
 | NewsAPI consumption + Room caching                | **not implemented yet**                                                                                |
 | Glide image loading                               | **not implemented yet**                                                                                |
@@ -38,7 +38,7 @@ Provably-fair game-outcome engine in C++17 with Android JNI bindings. The engine
 | Biometric-gated key storage                       | **not implemented yet**                                                                                |
 | On-chain integration (USDC, Polygon, Alchemy)     | **not implemented yet**                                                                                |
 
-What you can run today: the desktop test binary exercises every game algorithm and the input-validation paths; the Android app installs, shows the AndroidX SplashScreen with the brand icon on the SurfaceBase background, then `SplashViewModel` reads the cached Firebase Auth state and routes to either Login (no session) or Lobby (session persisted). From there the Compose `NavHost` exposes 16 destinations as labeled placeholders and the bottom navigation bar walks across the five primary tabs.
+What you can run today: the desktop test binary exercises every game algorithm and the input-validation paths; the Android app installs, shows the AndroidX SplashScreen with the brand icon on the SurfaceBase background, then `SplashViewModel` reads the cached Firebase Auth state and routes to either the Login screen (no session) or the Lobby placeholder (session persisted). The Login screen runs the real Google Sign-In flow via Credential Manager + Firebase Auth; once authenticated the user lands in the Lobby placeholder, and the Compose `NavHost` exposes the remaining 15 destinations as labeled placeholders driven by the five-tab bottom bar.
 
 ## What the engine does
 
@@ -97,7 +97,7 @@ The test binary prints 10 rounds for each game plus input-validation pass/fail. 
 
 `assembleDebug` compiles `libcasino-engine.so` via the Android NDK for the four target ABIs (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) and bundles it into the debug APK. The app launches into the AndroidX SplashScreen, `SplashViewModel` resolves the cached Firebase session, then routes to Login or Lobby; the five primary tabs (Lobby, Wallet, History, News, Profile) drive the bottom bar.
 
-`ktlintCheck detekt` enforces style and static-analysis gating; the same tasks run as the `lint` job in CI and gate the `android` job. `:app:testDebugUnitTest` runs the JVM unit tests (`StackCasinoAppTest`, `StackcasinoThemeTest`, `RouteTest`, `StartDestinationTest`, `SplashViewModelTest`).
+`ktlintCheck detekt` enforces style and static-analysis gating; the same tasks run as the `lint` job in CI and gate the `android` job. `:app:testDebugUnitTest` runs the JVM unit tests (`StackCasinoAppTest`, `StackcasinoThemeTest`, `RouteTest`, `StartDestinationTest`, `SplashViewModelTest`, `LoginViewModelTest`, `FirebaseUserMapperTest`, `AuthRepositoryImplTest`).
 
 Prerequisites: Android Studio (or the equivalent SDK + NDK + CMake bundle) and JDK 17.
 
@@ -112,6 +112,20 @@ If you fork the repo, replace it with one from your own Firebase project:
 3. Pin the debug build's SHA-1 so Google Sign-In can authenticate it: `keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android`. Copy the `SHA1:` line into the Firebase app settings under "Add fingerprint".
 4. Download the generated `google-services.json` and drop it in `app/`.
 5. `./gradlew :app:assembleDebug` should then succeed; the Firebase SDK self-initializes via `FirebaseInitProvider` (no manual `FirebaseApp.initializeApp` call required).
+
+### Google Sign-In setup
+
+To exercise the Login screen end-to-end (real account chooser, real Firebase session) the consumer also needs to enable the Google provider in Firebase Auth and expose its Web client ID to the app:
+
+1. Firebase Console -> `Build` -> `Authentication` -> `Get started`.
+2. `Sign-in method` tab -> `Google` -> toggle **Enable** -> pick a `Project support email` -> `Save`.
+3. Click the now-enabled `Google` provider and expand `Web SDK configuration` -> copy the **Web client ID** (not the Android one).
+4. Add it to `local.properties` (gitignored):
+   ```
+   GOOGLE_WEB_CLIENT_ID=123456789012-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com
+   ```
+
+The build reads the property and exposes it via `BuildConfig.GOOGLE_WEB_CLIENT_ID`; if the property is missing the field is empty and the runtime sign-in fails fast with a clear error so the UI surface still builds.
 
 ## Provably fair verification
 
